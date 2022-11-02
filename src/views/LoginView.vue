@@ -9,7 +9,7 @@
         <b-form-group id="input-group-1" label="아이디" label-for="input-1" description="">
           <b-form-input
             id="input-1"
-            v-model="form.userId"
+            v-model="form.userid"
             type="text"
             placeholder="아이디를 입력해주세요"
             required
@@ -19,7 +19,7 @@
         <b-form-group id="input-group-2" label="비밀번호" label-for="input-2">
           <b-form-input
             id="input-2"
-            v-model="form.userPassword"
+            v-model="form.userpwd"
             placeholder="비밀번호를 입력해주세요"
             type="password"
             required
@@ -54,9 +54,8 @@ export default {
   data() {
     return {
       form: {
-        userId: "",
-        userPassword: "",
-        checked: [],
+        userid: "",
+        userpwd: "",
       },
       show: true,
     };
@@ -64,8 +63,35 @@ export default {
   methods: {
     onSubmit(event) {
       event.preventDefault();
-      alert(JSON.stringify(this.form));
+      const option = {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(this.form),
+      };
+
+      fetch(`${process.env.VUE_APP_SERVER_URL}/users/login`, option)
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            return null;
+          }
+        })
+        .then((user) => {
+          if (user) {
+            // 로그인 성공
+            this.$store.commit("setUser", user);
+            this.$router.push("/");
+          } else {
+            // 로그인 실패
+            alert("아이디 또는 비밀번호가 다릅니다");
+          }
+        });
     },
+
     onReset(event) {
       event.preventDefault();
       // Reset our form values
