@@ -12,7 +12,7 @@
       <b-navbar-nav class="ml-auto">
         <b-navbar-nav v-if="$store.state.user?.userName">
           <b-nav-item href="#">안녕하세요 {{ $store.state.user.userName }} 님</b-nav-item>
-          <b-nav-item href="#">로그아웃</b-nav-item>
+          <b-nav-item href="#" @click="onLogout">로그아웃</b-nav-item>
         </b-navbar-nav>
         <b-navbar-nav v-else>
           <b-nav-item href="#">회원가입</b-nav-item>
@@ -22,3 +22,14 @@
     </b-collapse>
   </b-navbar>
 </template>
+
+<script>
+export default {
+  methods: {
+    onLogout(event) {
+      event.preventDefault();
+      this.$store.commit("setUser", {});
+    },
+  },
+};
+</script>
