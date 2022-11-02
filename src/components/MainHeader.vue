@@ -19,7 +19,7 @@
           </b-navbar-nav>
         </b-navbar-nav>
         <b-navbar-nav v-else>
-          <b-nav-item href="#">회원가입</b-nav-item>
+          <b-nav-item href="/sign-up">회원가입</b-nav-item>
           <b-nav-item href="/login">로그인</b-nav-item>
         </b-navbar-nav>
       </b-navbar-nav>

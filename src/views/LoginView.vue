@@ -95,9 +95,8 @@ export default {
     onReset(event) {
       event.preventDefault();
       // Reset our form values
-      this.form.userId = "";
-      this.form.userPassword = "";
-      this.form.checked = [];
+      this.form.userid = "";
+      this.form.userpwd = "";
       // Trick to reset/clear native browser form validation state
       this.show = false;
       this.$nextTick(() => {
