@@ -1,6 +1,6 @@
 <template>
   <b-navbar toggleable="lg" type="dark" variant="info">
-    <b-navbar-brand href="/">구해줘 홈즈</b-navbar-brand>
+    <b-navbar-brand to="/">구해줘 홈즈</b-navbar-brand>
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
@@ -11,7 +11,7 @@
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
         <b-navbar-nav v-if="$store.state.user?.userName">
-          <b-nav-item href="#">안녕하세요 {{ $store.state.user.userName }} 님</b-nav-item>
+          <b-nav-item to="/my-page">안녕하세요 {{ $store.state.user.userName }} 님</b-nav-item>
           <b-nav-item href="#" @click="onLogout">로그아웃</b-nav-item>
           <b-navbar-nav v-if="$store.state.user.authority == 'admin'">
             <b-nav-item href="#">회원등록</b-nav-item>
