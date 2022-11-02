@@ -1,6 +1,7 @@
 <template>
   <div class="home">
     <MainHeaderVue />
+    <b-img :src="require('../assets/image/main.png')" fluid-grow />
   </div>
 </template>
 
