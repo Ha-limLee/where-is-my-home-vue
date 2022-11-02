@@ -36,7 +36,7 @@
           </b-form-checkbox-group>
         </b-form-group>
 
-        <b-button type="submit" variant="primary">로그인</b-button>
+        <b-button type="submit" variant="primary" class="mr-2">로그인</b-button>
         <b-button type="reset" variant="danger">취소</b-button>
       </b-form>
       <b-card class="mt-3" header="Form Data Result">
