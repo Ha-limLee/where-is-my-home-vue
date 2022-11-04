@@ -72,7 +72,10 @@ export default {
   created() {
     fetch(`${process.env.VUE_APP_SERVER_URL}/users/user/${this.form.userId}`)
       .then((res) => res.json())
-      .then((val) => (this.$store.state.user = {...val}));
+      .then((val) => {
+        this.$store.state.user = { ...val }
+        this.form = {...val}
+      });
   },
   data() {
     return {
