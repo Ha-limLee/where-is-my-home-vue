@@ -54,7 +54,24 @@
         <b-row>
           <b-button type="submit" class="mr-2 ml-3" variant="primary">수정</b-button>
           <b-button type="reset" variant="secondary">초기화</b-button>
-          <b-button type="submit" class="ml-auto mr-3" variant="danger">회원탈퇴</b-button>
+          <b-button class="ml-auto mr-3" v-b-modal.modal-1 variant="danger">회원탈퇴</b-button>
+          <b-modal id="modal-1" title="회원탈퇴" hide-footer>
+            <b-form @submit="onResign">
+              <b-form-group id="input-group-id" label="비밀번호 확인" label-for="input-id" description="">
+                <b-form-input
+                  id="input-id"
+                  v-model="passwordCheck"
+                  type="password"
+                  placeholder="비밀번호를 입력해주세요"
+                  required
+                ></b-form-input>
+              </b-form-group>
+              <b-row align-h="end">
+                <b-button type="reset" class="mr-3">취소</b-button>
+                <b-button class="mr-3" variant="danger" @click="onResign">회원탈퇴</b-button>
+              </b-row>
+            </b-form>
+          </b-modal>
         </b-row>
       </b-form>
       <b-card class="mt-3" header="Form Data Result">
@@ -82,6 +99,7 @@ export default {
   data() {
     return {
       form: { ...this.$store.state.user },
+      passwordCheck: "",
       show: true,
     };
   },
@@ -115,6 +133,31 @@ export default {
         this.show = true;
       });
     },
+    onResign(event) {
+      event.preventDefault();
+      if (this.$store.state.user.userPassword === this.passwordCheck) {
+        const option = {
+          method: "DELETE",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        };
+
+        fetch(`${process.env.VUE_APP_SERVER_URL}/users/${this.$store.state.user.userId}`, option)
+          .then(res => {
+            if (res.ok) {
+              alert("회원탈퇴 완료");
+              this.$store.state.user = {};
+              this.$router.push("/");
+            } else {
+              alert("회원탈퇴 중 오류가 발생했습니다");
+            }
+          });
+      } else {
+        alert("비밀번호가 다릅니다");
+      }
+    }
   },
 };
 </script>
