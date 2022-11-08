@@ -83,17 +83,18 @@
 
 <script>
 import MainHeaderVue from "@/components/MainHeader.vue";
+import { getUser, modifyUser, resignUser } from '@/api/index';
 
 export default {
   components: {
     MainHeaderVue,
   },
   created() {
-    fetch(`${process.env.VUE_APP_SERVER_URL}/users/user/${this.form.userId}`)
-      .then((res) => res.json())
-      .then((val) => {
+    getUser(this.form.userId)
+      .then(res => res.data)
+      .then(val => {
         this.$store.state.user = { ...val }
-        this.form = {...val}
+        this.form = { ...val }
       });
   },
   data() {
@@ -115,13 +116,13 @@ export default {
         body: JSON.stringify(this.form),
       };
 
-      fetch(`${process.env.VUE_APP_SERVER_URL}/users/join`, option).then((res) => {
-        if (res.ok) {
+      modifyUser(this.form)
+        .then(res => {
           this.$store.state.user = { ...this.form };
-        } else {
+          alert("수정 완료");
+        }).catch(reason => {
           alert("회원정보 수정 오류");
-        }
-      });
+        });
     },
     onReset(event) {
       event.preventDefault();
@@ -144,15 +145,13 @@ export default {
           },
         };
 
-        fetch(`${process.env.VUE_APP_SERVER_URL}/users/${this.$store.state.user.userId}`, option)
+        resignUser(this.$store.state.user.userId)
           .then(res => {
-            if (res.ok) {
-              alert("회원탈퇴 완료");
-              this.$store.state.user = {};
-              this.$router.push("/");
-            } else {
-              alert("회원탈퇴 중 오류가 발생했습니다");
-            }
+            alert("회원탈퇴 완료");
+            this.$store.state.user = {};
+            this.$router.push("/");
+          }).catch(reason => {
+            alert("회원탈퇴 중 오류가 발생했습니다.");
           });
       } else {
         alert("비밀번호가 다릅니다");

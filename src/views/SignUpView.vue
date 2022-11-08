@@ -73,6 +73,7 @@
 
 <script>
 import MainHeaderVue from "@/components/MainHeader.vue";
+import { joinUser } from '@/api/index';
 
 export default {
   components: {
@@ -93,22 +94,14 @@ export default {
   methods: {
     onSubmit(event) {
       event.preventDefault();
-      const option = {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(this.form),
-      };
 
-      fetch(`${process.env.VUE_APP_SERVER_URL}/users/join`, option).then((res) => {
-        if (res.ok) {
+      joinUser(this.form)
+        .then(res => {
+          alert("회원가입 완료");
           this.$router.push("/login");
-        } else {
-          alert("중복된 아이디 입니다");
-        }
-      });
+        }).catch(reason => {
+          alert("중복된 아이디입니다.");
+        });
     },
     onReset(event) {
       event.preventDefault();
