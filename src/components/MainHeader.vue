@@ -13,10 +13,9 @@
         <b-navbar-nav v-if="$store.state.user?.userName">
           <b-nav-item to="/my-page">안녕하세요 {{ $store.state.user.userName }} 님</b-nav-item>
           <b-nav-item href="#" @click="onLogout">로그아웃</b-nav-item>
-          <b-navbar-nav v-if="$store.state.user.authority == 'admin'">
-            <b-nav-item href="#">회원등록</b-nav-item>
-            <b-nav-item href="#">회원탈퇴</b-nav-item>
-          </b-navbar-nav>
+          <template v-if="$store.state.user.authority == 'admin'">
+            <b-nav-item href="/user-list">회원목록</b-nav-item>
+          </template>
         </b-navbar-nav>
         <b-navbar-nav v-else>
           <b-nav-item href="/sign-up">회원가입</b-nav-item>

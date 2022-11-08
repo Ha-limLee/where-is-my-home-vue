@@ -48,6 +48,7 @@
 
 <script>
 import MainHeader from "@/components/MainHeader.vue";
+import api from "@/api";
 
 export default {
   components: { MainHeader },
@@ -63,32 +64,15 @@ export default {
   methods: {
     onSubmit(event) {
       event.preventDefault();
-      const option = {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(this.form),
-      };
 
-      fetch(`${process.env.VUE_APP_SERVER_URL}/users/login`, option)
-        .then((res) => {
-          if (res.ok) {
-            return res.json();
-          } else {
-            return null;
-          }
-        })
-        .then((user) => {
-          if (user) {
-            // 로그인 성공
-            this.$store.commit("setUser", user);
-            this.$router.push("/");
-          } else {
-            // 로그인 실패
-            alert("아이디 또는 비밀번호가 다릅니다");
-          }
+      api.loginUser(this.form)
+        .then((res) => res.data)
+        .then(user => {
+          // 로그인 성공
+          this.$store.commit("setUser", user);
+          this.$router.push("/");
+        }).catch(reason => {
+          alert("아이디 또는 비밀번호가 다릅니다.");
         });
     },
 
