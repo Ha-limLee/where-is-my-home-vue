@@ -83,14 +83,14 @@
 
 <script>
 import MainHeaderVue from "@/components/MainHeader.vue";
-import { getUser, modifyUser, resignUser } from '@/api/index';
+import api from '@/api/index';
 
 export default {
   components: {
     MainHeaderVue,
   },
   created() {
-    getUser(this.form.userId)
+    api.getUser(this.form.userId)
       .then(res => res.data)
       .then(val => {
         this.$store.state.user = { ...val }
@@ -116,7 +116,7 @@ export default {
         body: JSON.stringify(this.form),
       };
 
-      modifyUser(this.form)
+      api.modifyUser(this.form)
         .then(res => {
           this.$store.state.user = { ...this.form };
           alert("수정 완료");
@@ -145,7 +145,7 @@ export default {
           },
         };
 
-        resignUser(this.$store.state.user.userId)
+        api.resignUser(this.$store.state.user.userId)
           .then(res => {
             alert("회원탈퇴 완료");
             this.$store.state.user = {};

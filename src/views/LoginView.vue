@@ -48,7 +48,7 @@
 
 <script>
 import MainHeader from "@/components/MainHeader.vue";
-import { loginUser } from "@/api";
+import api from "@/api";
 
 export default {
   components: { MainHeader },
@@ -65,7 +65,7 @@ export default {
     onSubmit(event) {
       event.preventDefault();
 
-      loginUser(this.form)
+      api.loginUser(this.form)
         .then((res) => res.data)
         .then(user => {
           // 로그인 성공

@@ -73,7 +73,7 @@
 
 <script>
 import MainHeaderVue from "@/components/MainHeader.vue";
-import { joinUser } from '@/api/index';
+import api from '@/api/index';
 
 export default {
   components: {
@@ -95,7 +95,7 @@ export default {
     onSubmit(event) {
       event.preventDefault();
 
-      joinUser(this.form)
+      api.joinUser(this.form)
         .then(res => {
           alert("회원가입 완료");
           this.$router.push("/login");

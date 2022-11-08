@@ -7,6 +7,7 @@
 
 <script>
 import MainHeaderVue from "@/components/MainHeader.vue";
+import api from '@/api/index';
 
 export default {
     components: {
@@ -18,7 +19,8 @@ export default {
         }
     },
     created() {
-        
+        api.getUserList()
+            .then(res => (this.users = res.data));
     },
 }
 
