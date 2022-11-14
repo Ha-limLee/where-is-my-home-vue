@@ -53,7 +53,7 @@
 
 <script>
 import MainHeader from "@/components/MainHeader.vue";
-import api from "@/api";
+import { auth as api } from "@/api";
 
 export default {
   components: { MainHeader },

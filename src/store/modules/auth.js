@@ -1,4 +1,4 @@
-import api from "@/api/index";
+import { auth as api } from "@/api/index";
 import router from "@/router/index";
 
 const auth = {
