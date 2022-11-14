@@ -12,6 +12,12 @@ export default {
   loginUser(userData) {
     return axiosService.post("users/login", userData);
   },
+  logoutUser(userId) {
+    return axiosService.put(`users/logout/${userId}`);
+  },
+  refreshToken(userData) {
+    return axiosService.post("users/refresh", userData);
+  },
   getUser(userId) {
     return axiosService.get(`users/user/${userId}`);
   },
