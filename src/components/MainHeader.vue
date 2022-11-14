@@ -10,12 +10,12 @@
       </b-navbar-nav>
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
-        <b-navbar-nav v-if="$store.state.user?.userName">
+        <b-navbar-nav v-if="$store.state.auth.user?.userName">
           <b-nav-item to="/my-page"
-            >안녕하세요 {{ $store.state.user.userName }} 님</b-nav-item
+            >안녕하세요 {{ $store.state.auth.user.userName }} 님</b-nav-item
           >
           <b-nav-item href="#" @click="onLogout">로그아웃</b-nav-item>
-          <template v-if="$store.state.user.authority == 'admin'">
+          <template v-if="$store.state.auth.user.authority == 'admin'">
             <b-nav-item href="/user-list">회원목록</b-nav-item>
           </template>
         </b-navbar-nav>
@@ -32,13 +32,13 @@
 import { mapMutations, mapState } from "vuex";
 export default {
   computed: {
-    ...mapState(["isLogin", "user"]),
+    ...mapState("auth", ["isLogin", "user"]),
   },
   methods: {
-    ...mapMutations(["SET_IS_LOGIN", "SET_USER"]),
+    ...mapMutations("auth", ["SET_IS_LOGIN", "SET_USER"]),
     onLogout(event) {
       event.preventDefault();
-      this.$store.dispatch("userLogout", this.user.userId);
+      this.$store.dispatch("auth/userLogout", this.user.userId);
       sessionStorage.removeItem("access-token");
       sessionStorage.removeItem("refresh-token");
       try {

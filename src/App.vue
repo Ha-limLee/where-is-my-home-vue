@@ -7,11 +7,15 @@ import { mapState } from "vuex";
 
 export default {
   computed: {
-    ...mapState(["isLogin"]),
+    ...mapState("auth", ["isLogin"]),
   },
   watch: {
     $route(to, from) {
-      if (to.path != from.path && to.path != "/login") {
+      if (
+        to.path != from.path &&
+        to.path != "/login" &&
+        to.path != "/sign-up"
+      ) {
         if (!this.isLogin) {
           alert("로그인 후 이용 가능합니다");
           this.$router.push("/login");

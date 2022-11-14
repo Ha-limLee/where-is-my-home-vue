@@ -75,15 +75,16 @@ export default {
           const accessToken = res.data["access-token"];
           const refreshToken = res.data["refresh-token"];
           console.log(res.data);
-          this.$store.commit("SET_IS_LOGIN", true);
-          this.$store.commit("SET_IS_LOGIN_ERROR", false);
-          this.$store.commit("SET_USER", res.data["user"]);
+          this.$store.commit("auth/SET_IS_LOGIN", true);
+          this.$store.commit("auth/SET_IS_LOGIN_ERROR", false);
+          this.$store.commit("auth/SET_USER", res.data["user"]);
           sessionStorage.setItem("access-token", accessToken);
           sessionStorage.setItem("refresh-token", refreshToken);
           this.$router.push("/");
         } else {
-          this.$store.commit("SET_IS_LOGIN", false);
-          this.$store.commit("SET_IS_LOGIN_ERROR", true);
+          alert("아이디 또는 비밀번호가 다릅니다");
+          this.$store.commit("auth/SET_IS_LOGIN", false);
+          this.$store.commit("auth/SET_IS_LOGIN_ERROR", true);
         }
       });
     },
