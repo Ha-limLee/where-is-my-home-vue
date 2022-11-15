@@ -1,24 +1,19 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import api from "@/api/index";
+import router from "@/router/index";
+import createPersistedState from "vuex-persistedstate";
+import auth from "./modules/auth";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  state: {
-    user: {
-      userId: "",
-      userName: "",
-      userPassword: "",
-      address: "",
-      phoneNumber: "",
-    }
+  modules: {
+    auth,
   },
-  getters: {},
-  mutations: {
-    setUser: function (state, payload) {
-      state.user = { ...payload };
-    }
-  },
-  actions: {},
-  modules: {},
+  plugins: [
+    createPersistedState({
+      paths: ["auth"],
+    }),
+  ],
 });

@@ -4,16 +4,18 @@
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
-        <b-nav-item href="#">공지사항</b-nav-item>
+        <b-nav-item href="/notice">공지사항</b-nav-item>
         <b-nav-item href="#">아파트매매정보</b-nav-item>
         <b-nav-item href="#">관심지역 정보 조회</b-nav-item>
       </b-navbar-nav>
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
-        <b-navbar-nav v-if="$store.state.user?.userName">
-          <b-nav-item to="/my-page">안녕하세요 {{ $store.state.user.userName }} 님</b-nav-item>
+        <b-navbar-nav v-if="$store.state.auth.user?.userName">
+          <b-nav-item to="/my-page"
+            >안녕하세요 {{ $store.state.auth.user.userName }} 님</b-nav-item
+          >
           <b-nav-item href="#" @click="onLogout">로그아웃</b-nav-item>
-          <template v-if="$store.state.user.authority == 'admin'">
+          <template v-if="$store.state.auth.user.authority == 'admin'">
             <b-nav-item href="/user-list">회원목록</b-nav-item>
           </template>
         </b-navbar-nav>
@@ -27,11 +29,21 @@
 </template>
 
 <script>
+import { mapMutations, mapState } from "vuex";
 export default {
+  computed: {
+    ...mapState("auth", ["isLogin", "user"]),
+  },
   methods: {
+    ...mapMutations("auth", ["SET_IS_LOGIN", "SET_USER"]),
     onLogout(event) {
       event.preventDefault();
-      this.$store.commit("setUser", {});
+      this.$store.dispatch("auth/userLogout", this.user.userId);
+      sessionStorage.removeItem("access-token");
+      sessionStorage.removeItem("refresh-token");
+      try {
+        this.$router.push("/");
+      } catch (e) {}
     },
   },
 };

@@ -73,7 +73,7 @@
 
 <script>
 import MainHeaderVue from "@/components/MainHeader.vue";
-import api from '@/api/index';
+import { auth as api } from "@/api";
 
 export default {
   components: {

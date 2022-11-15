@@ -6,7 +6,12 @@
         <h3>로그인</h3>
       </b-row>
       <b-form @submit="onSubmit" @reset="onReset" v-if="show">
-        <b-form-group id="input-group-1" label="아이디" label-for="input-1" description="">
+        <b-form-group
+          id="input-group-1"
+          label="아이디"
+          label-for="input-1"
+          description=""
+        >
           <b-form-input
             id="input-1"
             v-model="form.userid"
@@ -48,7 +53,7 @@
 
 <script>
 import MainHeader from "@/components/MainHeader.vue";
-import api from "@/api";
+import { auth as api } from "@/api";
 
 export default {
   components: { MainHeader },
@@ -65,15 +70,23 @@ export default {
     onSubmit(event) {
       event.preventDefault();
 
-      api.loginUser(this.form)
-        .then((res) => res.data)
-        .then(user => {
-          // 로그인 성공
-          this.$store.commit("setUser", user);
+      api.loginUser(this.form).then((res) => {
+        if (res.data.message === "success") {
+          const accessToken = res.data["access-token"];
+          const refreshToken = res.data["refresh-token"];
+          console.log(res.data);
+          this.$store.commit("auth/SET_IS_LOGIN", true);
+          this.$store.commit("auth/SET_IS_LOGIN_ERROR", false);
+          this.$store.commit("auth/SET_USER", res.data["user"]);
+          sessionStorage.setItem("access-token", accessToken);
+          sessionStorage.setItem("refresh-token", refreshToken);
           this.$router.push("/");
-        }).catch(reason => {
-          alert("아이디 또는 비밀번호가 다릅니다.");
-        });
+        } else {
+          alert("아이디 또는 비밀번호가 다릅니다");
+          this.$store.commit("auth/SET_IS_LOGIN", false);
+          this.$store.commit("auth/SET_IS_LOGIN_ERROR", true);
+        }
+      });
     },
 
     onReset(event) {
