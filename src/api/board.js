@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const axiosService = axios.create();
+const axiosService = axios.create({ baseURL: "http://localhost:3000" });
 
 export default {
     getArticleType() {
@@ -12,10 +12,25 @@ export default {
     getArticle(type) {
         return axiosService.get(`board?type=${type}`);
     },
+    getArticleDetail(articleNo) {
+        return axiosService.get(`board/${articleNo}`);
+    },
     /**
      * @param { {userId: string, subject: string, content: string} } form 
      */
     writeArticle(form) {
         return axiosService.post("board", form);
+    },
+    editArticle(articleNo, form) {
+        return axiosService.put(`board/${articleNo}`, form);
+    },
+    deleteArticle(articleNo) {
+        return axiosService.delete(`board/${articleNo}`);
+    },
+    getComment(articleNo) {
+        return axiosService.get(`comment/article/${articleNo}`);
+    },
+    writeComment(articleNo, form) {
+        return axiosService.post(`comment/article/${articleNo}`, form);
     }
 };

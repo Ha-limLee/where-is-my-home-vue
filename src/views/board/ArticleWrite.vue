@@ -6,7 +6,7 @@
                 <b-form-group id="input-group-3" label="종류" label-for="input-3">
                     <b-form-select
                         id="input-3"
-                        v-model="form.type"
+                        v-model="form.articleProp"
                         :options="types"
                         required
                     ></b-form-select>
@@ -49,34 +49,43 @@
 
 <script>
 import MainHeaderVue from '@/components/MainHeader.vue';
-import { mapState } from 'vuex';
 import { board as boardApi } from '@/api';
 
 export default {
     components: {
         MainHeaderVue
     },
-    computed: {
-        ...mapState("auth", ["user"]),
+    created() {
+        this.form.userId = this.$store.state.auth.user.userId;
+        this.types = this.$store.state.board.articleType
+            .map(val => {
+                return {
+                    text: val.propName,
+                    value: val.id
+                }
+            });
     },
     data() {
       return {
         form: {
-          userId: '',
-          subject: '',
-          content: '',
-          type: "default",
+            userId: '',
+            subject: '',
+            content: '',
+            articleProp: 3,
         },
-        types: [{text: "일반", value: "default"}, {text: "Q&A", value: "qna"}, {text: "공지사항", value: "notice"}],
+        types: [],
         show: true
       }
     },
     methods: {
       onSubmit(event) {
         event.preventDefault()
-        const form = {...this.form, userId: this.user.userId};
+        const form = {...this.form};
         boardApi.writeArticle(form)
-            .then(res => this.$router.push("/board"))
+            .then(res => {
+                console.log(res);
+                this.$router.push("/board");
+            })
             .catch(err => alert("글 등록 실패"));
       },
       onReset(event) {

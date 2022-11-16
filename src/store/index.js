@@ -4,12 +4,13 @@ import api from "@/api/index";
 import router from "@/router/index";
 import createPersistedState from "vuex-persistedstate";
 import auth from "./modules/auth";
+import board from './modules/board';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   modules: {
-    auth,
+    auth, board
   },
   plugins: [
     createPersistedState({
