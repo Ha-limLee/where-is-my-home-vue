@@ -56,17 +56,7 @@
             </b-form>
 
             <div class="mt-3" v-for="(comment, index) in comments" :key="index">
-                <div>
-                    {{comment.userId}}
-                </div>
-                <b-form-textarea
-                    :placeholder="comment.content"
-                    disabled
-                    style="background-color: white"
-                ></b-form-textarea>
-                <div>
-                    {{ comment.modifyDate || comment.registerDate }}
-                </div>
+                <ArticleCommentVue :comment="comment"></ArticleCommentVue>
             </div>
 
             <hr/>
@@ -93,11 +83,13 @@
 
 <script>
 import MainHeaderVue from '@/components/MainHeader.vue';
+import ArticleCommentVue from "@/components/ArticleComment.vue";
 import { board as boardApi } from '@/api';
 
 export default {
     components: {
-        MainHeaderVue
+        MainHeaderVue,
+        ArticleCommentVue
     },
     created() {
         this.types = this.$store.state.board.articleType

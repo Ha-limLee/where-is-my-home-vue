@@ -66,40 +66,40 @@ export default {
             });
     },
     data() {
-      return {
-        form: {
-            userId: '',
-            subject: '',
-            content: '',
-            articleProp: 3,
-        },
-        types: [],
-        show: true
-      }
+        return {
+            form: {
+                userId: '',
+                subject: '',
+                content: '',
+                articleProp: 3,
+            },
+            types: [],
+            show: true
+        }
     },
     methods: {
-      onSubmit(event) {
-        event.preventDefault()
-        const form = {...this.form};
-        boardApi.writeArticle(form)
-            .then(res => {
-                console.log(res);
-                this.$router.push("/board");
+        onSubmit(event) {
+            event.preventDefault()
+            const form = {...this.form};
+            boardApi.writeArticle(form)
+                .then(res => {
+                    console.log(res);
+                    this.$router.push("/board");
+                })
+                .catch(err => alert("글 등록 실패"));
+        },
+        onReset(event) {
+            event.preventDefault()
+            // Reset our form values
+            this.form.subject = '';
+            this.form.content = '';
+            this.form.type = "default";
+            // Trick to reset/clear native browser form validation state
+            this.show = false
+            this.$nextTick(() => {
+            this.show = true
             })
-            .catch(err => alert("글 등록 실패"));
-      },
-      onReset(event) {
-        event.preventDefault()
-        // Reset our form values
-        this.form.subject = '';
-        this.form.content = '';
-        this.form.type = "default";
-        // Trick to reset/clear native browser form validation state
-        this.show = false
-        this.$nextTick(() => {
-          this.show = true
-        })
-      }
+        }
     }
 }
 
