@@ -7,7 +7,7 @@ import { mapActions, mapState } from "vuex";
 
 export default {
   created() {
-    this.setArticleType()
+    this.setArticleType();
   },
   methods: {
     ...mapActions("board", ["setArticleType"])

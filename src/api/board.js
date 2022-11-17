@@ -27,10 +27,17 @@ export default {
     deleteArticle(articleNo) {
         return axiosService.delete(`board/${articleNo}`);
     },
+
     getComment(articleNo) {
         return axiosService.get(`comment/article/${articleNo}`);
     },
     writeComment(articleNo, form) {
         return axiosService.post(`comment/article/${articleNo}`, form);
+    },
+    editComment(commentId, form) {
+        return axiosService.put(`comment/${commentId}`, form);
+    },
+    deleteComment(commentId) {
+        return axiosService.delete(`comment/${commentId}`);
     }
 };
