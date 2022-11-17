@@ -3,9 +3,15 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default {
+  created() {
+    this.setArticleType();
+  },
+  methods: {
+    ...mapActions("board", ["setArticleType"])
+  },
   computed: {
     ...mapState("auth", ["isLogin"]),
   },

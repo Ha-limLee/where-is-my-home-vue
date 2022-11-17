@@ -4,8 +4,8 @@
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
-        <b-nav-item href="/notice">공지사항</b-nav-item>
-        <b-nav-item href="/deal-list">아파트매매정보</b-nav-item>
+        <b-nav-item href="/board">게시판</b-nav-item>
+        <b-nav-item href="#">아파트매매정보</b-nav-item>
         <b-nav-item href="#">관심지역 정보 조회</b-nav-item>
       </b-navbar-nav>
       <!-- Right aligned nav items -->

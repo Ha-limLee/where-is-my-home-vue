@@ -37,9 +37,24 @@ const routes = [
     component: () => import(/* webpackChunkName: "user-list" */ "../views/UserList.vue"),
   },
   {
-    path: "/notice",
-    name: "notice",
-    component: () => import(/* webpackChunkName: "notice" */ "../views/NoticeView.vue"),
+    path: "/board",
+    name: "board",
+    component: () => import(/* webpackChunkName: "board" */ "../views/board/BoardView.vue"),
+  },
+  {
+    path: "/article-write",
+    name: "article-write",
+    component: () => import(/* webpackChunkName: "article-write" */ "../views/board/ArticleWrite.vue"),
+  },
+  {
+    path: "/article/:articleNo",
+    name: "article",
+    component: () => import(/* webpackChunkName: "article" */ "../views/board/ArticleView.vue"),
+  },
+  {
+    path: "/article-edit/:articleNo",
+    name: "article-edit",
+    component: () => import(/* webpackChunkName: "article-edit" */ "../views/board/ArticleEdit.vue"),
   },
   {
     path: "/deal-list",
