@@ -57,9 +57,9 @@ const routes = [
     component: () => import(/* webpackChunkName: "article-edit" */ "../views/board/ArticleEdit.vue"),
   },
   {
-    path: "/deal-list",
-    name: "deal-list",
-    component: () => import(/* webpackChunkName: "deal-list" */ "../views/DealList.vue"),
+    path: "/deal-board",
+    name: "deal-board",
+    component: () => import(/* webpackChunkName: "deal-board" */ "../views/deal-board/DealBoard.vue"),
   }
 ];
 

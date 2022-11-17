@@ -71,21 +71,19 @@ export default {
       event.preventDefault();
 
       api.loginUser(this.form).then((res) => {
-        if (res.data.message === "success") {
-          const accessToken = res.data["access-token"];
-          const refreshToken = res.data["refresh-token"];
-          console.log(res.data);
-          this.$store.commit("auth/SET_IS_LOGIN", true);
-          this.$store.commit("auth/SET_IS_LOGIN_ERROR", false);
-          this.$store.commit("auth/SET_USER", res.data["user"]);
-          sessionStorage.setItem("access-token", accessToken);
-          sessionStorage.setItem("refresh-token", refreshToken);
-          this.$router.push("/");
-        } else {
-          alert("아이디 또는 비밀번호가 다릅니다");
-          this.$store.commit("auth/SET_IS_LOGIN", false);
-          this.$store.commit("auth/SET_IS_LOGIN_ERROR", true);
-        }
+        const accessToken = res.data["access-token"];
+        const refreshToken = res.data["refresh-token"];
+        console.log(res.data);
+        this.$store.commit("auth/SET_IS_LOGIN", true);
+        this.$store.commit("auth/SET_IS_LOGIN_ERROR", false);
+        this.$store.commit("auth/SET_USER", res.data);
+        sessionStorage.setItem("access-token", accessToken);
+        sessionStorage.setItem("refresh-token", refreshToken);
+        this.$router.push("/");
+      }).catch(err => {
+        alert("아이디 또는 비밀번호가 다릅니다");
+        this.$store.commit("auth/SET_IS_LOGIN", false);
+        this.$store.commit("auth/SET_IS_LOGIN_ERROR", true);
       });
     },
 
