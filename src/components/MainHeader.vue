@@ -38,12 +38,14 @@ export default {
     ...mapMutations("auth", ["SET_IS_LOGIN", "SET_USER"]),
     onLogout(event) {
       event.preventDefault();
-      this.$store.dispatch("auth/userLogout", this.user.userId);
-      sessionStorage.removeItem("access-token");
-      sessionStorage.removeItem("refresh-token");
-      try {
-        this.$router.push("/");
-      } catch (e) {}
+      this.$store.dispatch("auth/userLogout")
+        .then(res => {
+          sessionStorage.removeItem("access-token");
+          sessionStorage.removeItem("refresh-token");
+          if (this.$route.path != "/") {
+            this.$router.push("/");
+          }
+        });
     },
   },
 };

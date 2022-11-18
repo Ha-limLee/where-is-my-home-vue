@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const axiosService = axios.create({ baseURL: "http://localhost:3000" });
+import { axiosService } from './instance';
 
 export default {
     getArticleType() {

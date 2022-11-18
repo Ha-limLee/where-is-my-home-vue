@@ -1,6 +1,5 @@
 import axios from "axios";
-
-const axiosService = axios.create();
+import { axiosService } from "./instance";
 
 export default {
     getAptListByDongCode(form) {

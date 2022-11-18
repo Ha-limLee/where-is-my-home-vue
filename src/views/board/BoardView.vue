@@ -18,7 +18,6 @@ import MainHeaderVue from "@/components/MainHeader.vue";
 import {board as boardApi} from '@/api';
 
 function select(data) {
-  console.log(data);
   const {articlePropName, articleNo, userId, subject, hit, registerTime} = data;
   return {
     articlePropName,
@@ -52,7 +51,6 @@ export default {
     onRowSelected(items) {
       const item = items[0];
       this.$router.push(`/article/${item.articleNo}`);
-      console.log(item);
     }
   }
 };
