@@ -118,7 +118,7 @@ export default {
   },
   created() {
     api
-      .getUser(this.form.userId)
+      .getUser()
       .then((res) => res.data)
       .then((val) => {
         this.SET_USER(val);

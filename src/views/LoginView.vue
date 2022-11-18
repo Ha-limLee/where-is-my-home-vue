@@ -14,7 +14,7 @@
         >
           <b-form-input
             id="input-1"
-            v-model="form.userid"
+            v-model="form.userId"
             type="text"
             placeholder="아이디를 입력해주세요"
             required
@@ -24,7 +24,7 @@
         <b-form-group id="input-group-2" label="비밀번호" label-for="input-2">
           <b-form-input
             id="input-2"
-            v-model="form.userpwd"
+            v-model="form.userPassword"
             placeholder="비밀번호를 입력해주세요"
             type="password"
             required
@@ -54,14 +54,15 @@
 <script>
 import MainHeader from "@/components/MainHeader.vue";
 import { auth as api } from "@/api";
+import jwt_decode from 'jwt-decode';
 
 export default {
   components: { MainHeader },
   data() {
     return {
       form: {
-        userid: "",
-        userpwd: "",
+        userId: "",
+        userPassword: "",
       },
       show: true,
     };
@@ -71,29 +72,37 @@ export default {
       event.preventDefault();
 
       api.loginUser(this.form).then((res) => {
-        if (res.data.message === "success") {
-          const accessToken = res.data["access-token"];
-          const refreshToken = res.data["refresh-token"];
-          console.log(res.data);
-          this.$store.commit("auth/SET_IS_LOGIN", true);
-          this.$store.commit("auth/SET_IS_LOGIN_ERROR", false);
-          this.$store.commit("auth/SET_USER", res.data["user"]);
-          sessionStorage.setItem("access-token", accessToken);
-          sessionStorage.setItem("refresh-token", refreshToken);
-          this.$router.push("/");
-        } else {
-          alert("아이디 또는 비밀번호가 다릅니다");
-          this.$store.commit("auth/SET_IS_LOGIN", false);
-          this.$store.commit("auth/SET_IS_LOGIN_ERROR", true);
-        }
+        const accessToken = res.headers["access-token"];
+        const refreshToken = res.headers["refresh-token"];
+        /**
+         * @type { {exp: number, id: string, role: string, sub: string, username: string} }
+         */
+        const decoded = jwt_decode(accessToken);
+        
+        console.log(decoded);
+
+        this.$store.commit("auth/SET_IS_LOGIN", true);
+        this.$store.commit("auth/SET_IS_LOGIN_ERROR", false);
+        this.$store.commit("auth/SET_USER", {
+          userId: decoded.id,
+          userName: decoded.username,
+          role: decoded.role,
+        });
+        sessionStorage.setItem("access-token", accessToken);
+        sessionStorage.setItem("refresh-token", refreshToken);
+        this.$router.push("/");
+      }).catch(err => {
+        alert("아이디 또는 비밀번호가 다릅니다");
+        this.$store.commit("auth/SET_IS_LOGIN", false);
+        this.$store.commit("auth/SET_IS_LOGIN_ERROR", true);
       });
     },
 
     onReset(event) {
       event.preventDefault();
       // Reset our form values
-      this.form.userid = "";
-      this.form.userpwd = "";
+      this.form.userId = "";
+      this.form.userPassword = "";
       // Trick to reset/clear native browser form validation state
       this.show = false;
       this.$nextTick(() => {

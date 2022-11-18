@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import HomeView from "../views/HomeView.vue";
+import store from '@/store';
 
 Vue.use(VueRouter);
 
@@ -30,6 +31,9 @@ const routes = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "my-page" */ "../views/MyPage.vue"),
+    meta: {
+      authRequired: true
+    },
   },
   {
     path: "/user-list",
@@ -45,6 +49,9 @@ const routes = [
     path: "/article-write",
     name: "article-write",
     component: () => import(/* webpackChunkName: "article-write" */ "../views/board/ArticleWrite.vue"),
+    meta: {
+      authRequired: true,
+    },
   },
   {
     path: "/article/:articleNo",
@@ -55,13 +62,32 @@ const routes = [
     path: "/article-edit/:articleNo",
     name: "article-edit",
     component: () => import(/* webpackChunkName: "article-edit" */ "../views/board/ArticleEdit.vue"),
+    meta: {
+      authRequired: true,
+    },
   },
+  {
+    path: "/deal-board",
+    name: "deal-board",
+    component: () => import(/* webpackChunkName: "deal-board" */ "../views/deal-board/DealBoard.vue"),
+  }
 ];
 
 const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
   routes,
+});
+
+router.beforeEach(function (to, from, next) {
+  if (to.matched.some(function (routeInfo) {
+    return routeInfo.meta.authRequired && !store.state.auth.isLogin;
+  })) {
+    alert("로그인이 필요합니다");
+    next("/login");
+  } else {
+    next();
+  }
 });
 
 export default router;

@@ -1,6 +1,5 @@
 import axios from "axios";
-
-const axiosService = axios.create();
+import { axiosService } from "./instance";
 
 export default {
   joinUser(userData) {
@@ -12,14 +11,14 @@ export default {
   loginUser(userData) {
     return axiosService.post("users/login", userData);
   },
-  logoutUser(userId) {
-    return axiosService.put(`users/logout/${userId}`);
+  logoutUser() {
+    return axiosService.put(`users/logout`);
   },
   refreshToken(userData) {
     return axiosService.post("users/refresh", userData);
   },
-  getUser(userId) {
-    return axiosService.get(`users/user/${userId}`);
+  getUser() {
+    return axiosService.get(`users/user/mypage`);
   },
   resignUser(userId) {
     return axiosService.delete(`users/${userId}`);

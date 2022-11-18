@@ -5,7 +5,7 @@
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
         <b-nav-item href="/board">게시판</b-nav-item>
-        <b-nav-item href="#">아파트매매정보</b-nav-item>
+        <b-nav-item href="/deal-board">아파트매매정보</b-nav-item>
         <b-nav-item href="#">관심지역 정보 조회</b-nav-item>
       </b-navbar-nav>
       <!-- Right aligned nav items -->
@@ -38,12 +38,14 @@ export default {
     ...mapMutations("auth", ["SET_IS_LOGIN", "SET_USER"]),
     onLogout(event) {
       event.preventDefault();
-      this.$store.dispatch("auth/userLogout", this.user.userId);
-      sessionStorage.removeItem("access-token");
-      sessionStorage.removeItem("refresh-token");
-      try {
-        this.$router.push("/");
-      } catch (e) {}
+      this.$store.dispatch("auth/userLogout")
+        .then(res => {
+          sessionStorage.removeItem("access-token");
+          sessionStorage.removeItem("refresh-token");
+          if (this.$route.path != "/") {
+            this.$router.push("/");
+          }
+        });
     },
   },
 };
