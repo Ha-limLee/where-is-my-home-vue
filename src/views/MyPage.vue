@@ -110,7 +110,7 @@
 <script>
 import MainHeaderVue from "@/components/MainHeader.vue";
 import { auth as api } from "@/api";
-import { mapState, mapMutations } from "vuex";
+import { mapMutations } from "vuex";
 
 export default {
   components: {
