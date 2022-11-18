@@ -20,7 +20,7 @@ export default {
     },
     name: "KakaoMap",
     watch: {
-        aptList(newVal, oldVal) {
+        "aptList": function (newVal, oldVal) {
             if (newVal !== oldVal) {
                 this.markApts();
             }
@@ -88,7 +88,8 @@ export default {
             }, {});
 
             if (Object.keys(apts).length > 0) {
-                this.markers = Object.values(apts).map(
+                const positions = Object.values(apts);
+                this.markers = positions.map(
                 (position) =>
                     new kakao.maps.Marker({
                     map: this.map,
