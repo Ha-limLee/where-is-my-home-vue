@@ -19,6 +19,13 @@ export default {
         "aptList": Array
     },
     name: "KakaoMap",
+    watch: {
+        aptList(newVal, oldVal) {
+            if (newVal !== oldVal) {
+                this.markApts();
+            }
+        },
+    },
     data() {
         return {
             markerPositions1: [
@@ -74,14 +81,14 @@ export default {
                 this.markers.forEach((marker) => marker.setMap(null));
             }
 
-            const positions = this.aptList.map(x => {
-                return new kakao.maps.LatLng(x.lat, x.lng);
-            })
+            const apts = this.aptList.reduce((prev, {aptCode, lat, lng}) => {
+                const latlng = new kakao.maps.LatLng(lat, lng);
+                prev[aptCode] = latlng;
+                return prev;
+            }, {});
 
-            console.log(positions);
-
-            if (positions.length > 0) {
-                this.markers = positions.map(
+            if (Object.keys(apts).length > 0) {
+                this.markers = Object.values(apts).map(
                 (position) =>
                     new kakao.maps.Marker({
                     map: this.map,

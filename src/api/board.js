@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { axiosService } from './instance';
 
 export default {

@@ -1,4 +1,3 @@
-import axios from "axios";
 import { axiosService } from "./instance";
 
 export default {
@@ -14,8 +13,8 @@ export default {
   logoutUser() {
     return axiosService.put(`users/logout`);
   },
-  refreshToken(userData) {
-    return axiosService.post("users/refresh", userData);
+  refreshToken() {
+    return axiosService.get("users/token/refresh");
   },
   getUser() {
     return axiosService.get(`users/user/mypage`);

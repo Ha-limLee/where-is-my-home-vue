@@ -1,72 +1,77 @@
 <template>
     <div>
         <MainHeader></MainHeader>
-        <h2 class="text-center mt-5 mb-3">아파트 매매 정보</h2>
-        <div class="row col-md-12 justify-content-center mb-2">
-            <div class="form-group col-md-2">
-                <select @change="onSidoSelected" class="form-select bg-secondary text-light" id="sido">
-                    <option value="">시도선택</option>
-                </select>
-            </div>
-            <div class="form-group col-md-2">
-                <select @change="onGugunSelected" class="form-select bg-secondary text-light" id="gugun">
-                    <option value="">구군선택</option>
-                </select>
-            </div>
-            
-            <div class="form-group col-md-2">
-                <select @change="onDongSelected" class="form-select bg-secondary text-light" id="dong">
-                    <option value="">동선택</option>
-                </select>
-            </div>
-            <div class="form-group col-md-2">
-                <select v-model="form.startyear" class="form-select bg-dark text-light" id="year"></select>
-            </div>
-            <div class="form-group col-md-2">
-                <select v-model="form.startmonth" class="form-select bg-dark text-light" id="month">
-                    <option value="">매매월선택</option>
-                </select>
-            </div>
-            <div class="form-group col-md-2">
-                <button @click="onGetClick" type="button" id="list-btn" class="btn btn-outline-primary">
-                    아파트매매정보가져오기</button>
-            </div>
-            
-            <div class="form-group col-md-2">
-                <select id="sort-order" name="sort-order" class="form-select" aria-label="Default select example">
-                <option selected>정렬 순서 선택</option>
-                <option value="1">오름차순</option>
-                <option value="2">내림차순</option>
-                </select>
-            </div>
-            <div class="form-group col-md-2">
-                <select id="sort-type" name="sort-type" class="form-select" aria-label="Default select example">
-                <option selected>정렬 기준 선택</option>
-                <option value="1">아파트이름</option>
-                <option value="2">층</option>
-                <option value="3">면적</option>
-                <option value="4">거래금액</option>
-                </select>
-            </div>
-            <div class="form-group col-md-1">
-                <button id="sort-btn" type="button" class="btn btn-outline-secondary">
-                    정렬
-                </button>
-            </div>
-            
-            <div class="form-group col-md-3">
-                <input v-model="form.keyword" class="form-control" type="text" id="apt-name"
-                    placeholder="아파트 이름을 입력해주세요">
-            </div>
-	    </div>
+        <b-container>
+            <h2 class="text-center mt-5 mb-3">아파트 매매 정보</h2>
+            <b-row>
+                <div class="form-group col-md-2">
+                    <select @change="onSidoSelected" class="form-select bg-secondary text-light" id="sido">
+                        <option value="">시도선택</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <select @change="onGugunSelected" class="form-select bg-secondary text-light" id="gugun">
+                        <option value="">구군선택</option>
+                    </select>
+                </div>
+                
+                <div class="form-group col-md-2">
+                    <select @change="onDongSelected" class="form-select bg-secondary text-light" id="dong">
+                        <option value="">동선택</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <select v-model="form.startyear" class="form-select bg-dark text-light" id="year"></select>
+                </div>
+                <div class="form-group col-md-2">
+                    <select v-model="form.startmonth" class="form-select bg-dark text-light" id="month">
+                        <option value="">매매월선택</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <button @click="onGetClick" type="button" id="list-btn" class="btn btn-outline-primary">
+                        아파트 매매 정보 가져오기</button>
+                </div>
+            </b-row>
+            <b-row>
+                <div class="form-group col-md-2">
+                    <select id="sort-order" name="sort-order" class="form-select" aria-label="Default select example">
+                    <option selected>정렬 순서 선택</option>
+                    <option value="1">오름차순</option>
+                    <option value="2">내림차순</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <select id="sort-type" name="sort-type" class="form-select" aria-label="Default select example">
+                    <option selected>정렬 기준 선택</option>
+                    <option value="1">아파트이름</option>
+                    <option value="2">층</option>
+                    <option value="3">면적</option>
+                    <option value="4">거래금액</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-1">
+                    <button id="sort-btn" type="button" class="btn btn-outline-secondary">
+                        정렬
+                    </button>
+                </div>
+                
+                <div class="form-group col-md-3">
+                    <input v-model="form.keyword" class="form-control" type="text" id="apt-name"
+                        placeholder="아파트 이름을 입력해주세요">
+                </div>
+            </b-row>
 
-        <b-card class="mt-3" header="Form Data Result">
-            <pre class="m-0">{{ form }}</pre>
-        </b-card>
+            <b-card class="mt-3" header="Form Data Result">
+                <pre class="m-0">{{ form }}</pre>
+            </b-card>
+            
+            <b-row>
+                <b-table striped hover :items="aptList" :fields="fields"></b-table>
+            </b-row>
 
-        <b-table striped hover :items="aptList"></b-table>
-
-        <KakaoMapVue :apt-list="this.aptList"></KakaoMapVue>
+            <KakaoMapVue :apt-list="this.aptList"></KakaoMapVue>
+        </b-container>
     </div>
 </template>
 
@@ -101,6 +106,21 @@ export default {
     data() {
         return {
             aptList: [],
+            /**
+             * @type {[{key: string, label: string, sortable: boolean, variant?: string}]}
+             */
+            fields: [
+                {
+                    key: "aptName",
+                    label: "아파트 이름",
+                    sortable: true,
+                },
+                {
+                    key: "price",
+                    label: "가격",
+                    sortable: true,
+                }
+            ],
             form: {
                 si: "",
                 gugun: "",
