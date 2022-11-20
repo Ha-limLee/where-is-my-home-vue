@@ -5,8 +5,8 @@
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
         <b-nav-item href="/board">게시판</b-nav-item>
-        <b-nav-item href="/deal-board">아파트매매정보</b-nav-item>
-        <b-nav-item href="#">관심지역 정보 조회</b-nav-item>
+        <b-nav-item href="/deal-board">아파트 매매 정보</b-nav-item>
+        <b-nav-item href="/interest-board">관심지역</b-nav-item>
       </b-navbar-nav>
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
