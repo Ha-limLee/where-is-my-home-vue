@@ -75,6 +75,14 @@ const routes = [
     path: "/interest-board",
     name: "interest-board",
     component: () => import(/* webpackChunkName: "interest-board" */ "../views/interest-board/InterestBoard.vue"),
+    meta: {
+      authRequired: true,
+    }
+  },
+  {
+    path: "/building-board",
+    name: "building-board",
+    component: () => import(/* webpackChunkName: "building-board" */ "../views/building-board/BuildingBoard.vue"),
   }
 ];
 

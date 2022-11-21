@@ -34,4 +34,12 @@ export default {
     getAptAndTradeById(aptId) {
         return axiosService.get(`/estate/apartment/${aptId}`);
     },
+
+    /**
+     * 키워드와 건물 매치
+     * @param {*} keyword 
+     */
+    getBuildingListByKeyword(keyword) {
+        return axiosService.get(`/estate/building/keyword/${keyword}`);
+    }
 };
