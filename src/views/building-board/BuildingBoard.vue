@@ -5,17 +5,8 @@
             <h2 class="text-center mt-5 mb-3">건물 주위 아파트 검색</h2>
             <b-row>
                 <div>
-                    <b-form-input @keydown="onOptionClick" v-model="buildingKeyword" debounce="500" list="building-list"></b-form-input>
-                    <b-form-select :select-size="0" :options="options"></b-form-select>
-                    <datalist id="building-list">
-                        <option>지하철역, 버스정류장, 아파트, 주변상권 이름을 입력해주세요</option>
-    
-                        <option v-for="option, i in options" :value="option.text" :data-value="option.value" :key="i">
-                            <div>
-                                {{option.value}}
-                            </div>
-                        </option>
-                    </datalist>
+                    <b-form-input v-b-tooltip.hover title="지하철역, 버스정류장, 아파트, 주변상권 이름을 입력해주세요" v-model="buildingKeyword" debounce="500"></b-form-input>
+                    <b-form-select v-if="options.length" v-model="selected" :select-size="4" :options="options"></b-form-select>
                 </div>
 
                 <div class="form-group col-md-2">
