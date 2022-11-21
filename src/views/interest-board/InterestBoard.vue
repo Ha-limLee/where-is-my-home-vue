@@ -9,6 +9,7 @@
                         <option value="">시도선택</option>
                     </select>
                 </div>
+
                 <div class="form-group col-md-2">
                     <select @change="onGugunSelected" class="form-select bg-secondary text-light" id="gugun">
                         <option value="">구군선택</option>
@@ -22,21 +23,30 @@
                 </div>
                 
                 <div class="form-group col-md-2">
-                    <button @click="onGetClick" type="button" id="list-btn" class="btn btn-outline-primary">
+                    <button @click="onAddInterest" type="button" id="list-btn" class="btn btn-outline-primary">
                         관심지역 추가
                     </button>
                 </div>
             </b-row>
-
-            <b-card class="mt-3" header="Form Data Result">
-                <pre class="m-0">{{ form }}</pre>
-            </b-card>
             
             <b-row>
-                <b-table striped hover :items="aptList" :fields="fields"></b-table>
+                <b-table selectable @row-selected="onRowSelected" select-mode="single" hover :items="interestList" :fields="interestFields">
+                    <template v-slot:cell(action)="{ item }">
+                        <span><b-btn @click="onDeleteInterest">삭제</b-btn></span>
+                    </template>
+                </b-table>
             </b-row>
 
-            <KakaoMapVue :apt-list="this.aptList"></KakaoMapVue>
+            <KakaoMapVue @markerClick="onMarkerClick" :apt-list="this.aptList"></KakaoMapVue>
+
+            <b-sidebar v-model="openSidebar" id="sidebar-right" title="Sidebar" right shadow width="500px">
+                <div class="px-3 py-2">
+                    <h4>{{selected.houseInfo.apartmentName}}</h4>
+                    <p>{{selected.houseInfo.roadName}} | 건설년도: {{selected.houseInfo.buildyear}}</p>
+                    <b-table :items="selected.houseDealList" :fields="selected.fields"></b-table>
+                </div>
+            </b-sidebar>
+    
         </b-container>
     </div>
 </template>
@@ -46,10 +56,35 @@ import MainHeader from '@/components/MainHeader.vue';
 import KakaoMapVue from "@/components/KakaoMap.vue";
 import { estate as estateApi } from '@/api';
 
+
+/**
+ * @typedef {Object} Interest
+ * @property {string} dongCode
+ * @property {string} dongName
+ * @property {string} gugunName
+ * @property {string} sidoName
+ */
+
+/**
+ * @typedef {Object} SimpleApt
+ * @property {string} apartmentName
+ * @property {number} aptCode
+ * @property {number} buildyear
+ * @property {string} dongCode
+ * @property {string} lat
+ * @property {string} lng
+ */
+
 export default {
     components: {
         MainHeader,
-        KakaoMapVue
+        KakaoMapVue,
+    },
+    created() {
+        estateApi.getInterestLocation()
+            .then(({ data }) => {
+                this.interestList = data;
+            });
     },
     mounted() {
         this.$nextTick(function() {
@@ -68,7 +103,7 @@ export default {
             /**
              * @type {[{key: string, label: string, sortable: boolean, variant?: string}]}
              */
-            fields: [
+            aptFields: [
                 {
                     key: "aptName",
                     label: "아파트 이름",
@@ -80,14 +115,68 @@ export default {
                     sortable: true,
                 }
             ],
+            /**
+             * @type { Interest[] }
+             */
+            interestList: [],
+            interestFields: [
+                {
+                    key: "sidoName",
+                    label: "시/도",
+                    sortable: true,
+                },
+                {
+                    key: "gugunName",
+                    label: "구/군",
+                    sortable: true,
+                },
+                {
+                    key: "dongName",
+                    label: "동",
+                    sortable: true,
+                }, {
+                    key: "action",
+                    label: "",
+                    sortable: false,
+                }
+            ],
             form: {
                 si: "",
                 gugun: "",
                 dong: "",
-                startyear: "",
-                startmonth: "",
-                keyword: "",
-            }
+            },
+            openSidebar: false,
+            selected: {
+                houseInfo: {},
+                houseDealList: [],
+                fields: [
+                    {
+                        key: "dealYear",
+                        label: "년",
+                        sortable: true,
+                    },
+                    {
+                        key: "dealMonth",
+                        label: "월",
+                        sortable: true,
+                    },
+                    {
+                        key: "dealDay",
+                        label: "일",
+                        sortable: true,
+                    },
+                    {
+                        key: "dealAmount",
+                        label: "거래가격",
+                        sortable: true,
+                    },
+                    {
+                        key: "floor",
+                        label: "층수",
+                        sortable: true,
+                    }
+                ]
+            },
         }
     },
     methods: {
@@ -100,12 +189,62 @@ export default {
         onDongSelected(e) {
             this.form.dong = e.target.value;
         },
-        onGetClick(e) {
+        onAddInterest(e) {
             e.preventDefault();
-            estateApi.getAptListByDongCode(this.form)
-                .then(({ data }) => {
-                    this.aptList = data;
+            const dongCode = this.form.dong;
+            estateApi.addInterest(dongCode)
+                .then(res => {
+                    estateApi.getInterestLocation()
+                        .then(({ data }) => {
+                            this.interestList = data;
+                        });
                 });
+        },
+        onDeleteInterest(e) {
+            e.preventDefault();
+            const dongCode = this.form.dong;
+            estateApi.deleteInterest(dongCode)
+                .then(res => {
+                    estateApi.getInterestLocation()
+                        .then(({ data }) => {
+                            this.interestList = data;
+                        });
+                });
+        },
+
+        /**
+         * @param { Interest[] } items 
+         */
+        onRowSelected(items) {
+            const { dongCode } = items[0];
+            estateApi.getAptListByDongCode(dongCode)
+                .then(({ data }) => {
+                    /**
+                     * @type {SimpleApt}
+                     */
+                    const apt = data;
+                    this.aptList = apt;
+                });
+        },
+        onMarkerClick(aptId) {
+            this.openSidebar = true;
+            estateApi.getAptAndTradeById(aptId)
+                .then(({ data }) => {
+                    const { houseInfo, houseDealList } = data;
+                    houseDealList.sort((a, b) => {
+                        if (a.dealYear === b.dealYear) {
+                            if (a.dealMonth === b.dealMonth) {
+                                return -(a.dealDay - b.dealDay);
+                            } else {
+                                return -(a.dealMonth - b.dealMonth);
+                            }
+                        } else {
+                            return -(a.dealYear - b.dealYear);
+                        }
+                    });
+                    this.selected.houseInfo = houseInfo;
+                    this.selected.houseDealList = houseDealList;
+                })
         }
     }
 }
@@ -156,34 +295,34 @@ function addOption(selid, data) {
     case "gugun":
         opt += `<option value="">구군선택</option>`;
         for (let i = 0; i < data.regcodes.length; i++) {
-        if (i != data.regcodes.length - 1) {
-            if (
-            data.regcodes[i].name.split(" ")[1] == data.regcodes[i + 1].name.split(" ")[1] &&
-            data.regcodes[i].name.split(" ").length !=
-            data.regcodes[i + 1].name.split(" ").length
-            ) {
-            data.regcodes.splice(i, 1);
-            i--;
+            if (i != data.regcodes.length - 1) {
+                if (
+                data.regcodes[i].name.split(" ")[1] == data.regcodes[i + 1].name.split(" ")[1] &&
+                data.regcodes[i].name.split(" ").length !=
+                data.regcodes[i + 1].name.split(" ").length
+                ) {
+                data.regcodes.splice(i, 1);
+                i--;
+                }
             }
-        }
         }
         let name = "";
         data.regcodes.forEach(function (regcode) {
-        if (regcode.name.split(" ").length == 2) name = regcode.name.split(" ")[1];
-        else name = regcode.name.split(" ")[1] + " " + regcode.name.split(" ")[2];
-        opt += `
-            <option value=`+regcode.code+`>`+name+`</option>
-            `;
+            if (regcode.name.split(" ").length == 2) name = regcode.name.split(" ")[1];
+            else name = regcode.name.split(" ")[1] + " " + regcode.name.split(" ")[2];
+            opt += `
+                <option value=`+regcode.code+`>`+name+`</option>
+                `;
         });
         break;
     case "dong":
         opt += `<option value="">동선택</option>`;
         let idx = 2;
         data.regcodes.forEach(function (regcode) {
-        if (regcode.name.split(" ").length != 3) idx = 3;
-        opt += `
-            <option value=`+regcode.code+`>`+regcode.name.split(" ")[idx]+`</option>
-            `;
+            if (regcode.name.split(" ").length != 3) idx = 3;
+            opt += `
+                <option value=`+regcode.code+`>`+regcode.name.split(" ")[idx]+`</option>
+                `;
         });
     }
     document.querySelector('#'+selid).innerHTML = opt;
@@ -222,7 +361,7 @@ function getYearInfo(date) {
     let yearOpt = `<option value="">매매년도선택</option>`;
     let year = date.getFullYear();
     for (let i = year; i > year - 20; i--) {
-    yearOpt += `<option value=`+i+`>`+i+`년</option>`;
+        yearOpt += `<option value=`+i+`>`+i+`년</option>`;
     }
     yearEl.innerHTML = yearOpt;
 

@@ -155,7 +155,7 @@ export default {
         },
         onGetClick(e) {
             e.preventDefault();
-            estateApi.getAptListByDongCode(this.form)
+            estateApi.getAptListByOption(this.form)
                 .then(({ data }) => {
                     this.aptList = data;
                 });
