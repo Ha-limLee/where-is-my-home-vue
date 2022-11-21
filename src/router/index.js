@@ -70,6 +70,11 @@ const routes = [
     path: "/deal-board",
     name: "deal-board",
     component: () => import(/* webpackChunkName: "deal-board" */ "../views/deal-board/DealBoard.vue"),
+  },
+  {
+    path: "/interest-board",
+    name: "interest-board",
+    component: () => import(/* webpackChunkName: "interest-board" */ "../views/interest-board/InterestBoard.vue"),
   }
 ];
 

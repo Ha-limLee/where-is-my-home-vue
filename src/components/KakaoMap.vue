@@ -87,23 +87,46 @@ export default {
                 return prev;
             }, {});
 
-            if (Object.keys(apts).length > 0) {
-                const positions = Object.values(apts);
-                this.markers = positions.map(
-                (position) =>
-                    new kakao.maps.Marker({
-                    map: this.map,
-                    position,
-                    })
-                );
+            if (this.aptList.length) {
+                const vueInstance = this;
+                const map = this.map;
+                const bounds = new kakao.maps.LatLngBounds();
+                for (let i = 0; i < this.aptList.length || 0; i++) {
+                    const apt = this.aptList[i];
+                    const { lat, lng } = apt;
+                    const position = new kakao.maps.LatLng(lat, lng);
+                    const marker = new kakao.maps.Marker({ map: this.map, position });
+                    
+                    kakao.maps.event.addListener(marker, 'click', function () {
+                        vueInstance.$emit('markerClick', apt.aptCode);
+                        map.panTo(position);
+                    });
 
-                const bounds = positions.reduce(
-                (bounds, latlng) => bounds.extend(latlng),
-                new kakao.maps.LatLngBounds()
-                );
-
+                    this.markers.push(marker);
+                    bounds.extend(position);
+                }
                 this.map.setBounds(bounds);
             }
+
+            // console.log(this.aptList);
+
+            // if (Object.keys(apts).length > 0) {
+            //     const positions = Object.values(apts);
+            //     this.markers = positions.map((position) => {
+            //         const marker = new kakao.maps.Marker({ map: this.map, position, });
+            //         kakao.maps.event.addListener(marker, 'click', function () {
+            //             console.log(console.log(position));
+            //         });
+            //         return marker;
+            //     });
+
+            //     const bounds = positions.reduce(
+            //         (bounds, latlng) => bounds.extend(latlng),
+            //         new kakao.maps.LatLngBounds()
+            //     );
+
+            //     this.map.setBounds(bounds);
+            // }
         },
         displayMarker(markerPositions) {
             if (this.markers.length > 0) {
