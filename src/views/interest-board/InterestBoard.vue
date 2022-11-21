@@ -32,7 +32,7 @@
             <b-row>
                 <b-table selectable @row-selected="onRowSelected" select-mode="single" hover :items="interestList" :fields="interestFields">
                     <template v-slot:cell(action)="{ item }">
-                        <span><b-btn @click="onDeleteInterest">삭제</b-btn></span>
+                        <b-btn variant="outline-danger" @click="onDeleteInterest">삭제</b-btn>
                     </template>
                 </b-table>
             </b-row>
