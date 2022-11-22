@@ -6,7 +6,7 @@
             <b-row>
                 <div>
                     <b-form-input v-b-tooltip.hover title="지하철역, 버스정류장, 아파트, 주변상권 이름을 입력해주세요" v-model="buildingKeyword" debounce="500"></b-form-input>
-                    <b-form-select v-if="options.length" v-model="selected" :select-size="4" :options="options"></b-form-select>
+                    <b-form-select v-if="options.length" style="z-index: -1;" v-model="selected" :select-size="4" :options="options"></b-form-select>
                 </div>
 
                 <div class="form-group col-md-2">

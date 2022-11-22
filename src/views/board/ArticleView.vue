@@ -85,11 +85,15 @@
 import MainHeaderVue from '@/components/MainHeader.vue';
 import ArticleCommentVue from "@/components/ArticleComment.vue";
 import { board as boardApi } from '@/api';
+import { mapState } from "vuex";
 
 export default {
     components: {
         MainHeaderVue,
         ArticleCommentVue
+    },
+    computed: {
+        ...mapState("auth", ["user"]),
     },
     created() {
         this.types = this.$store.state.board.articleType
@@ -172,7 +176,7 @@ export default {
             event.preventDefault();
             boardApi.writeComment(this.articleNo, {
                 content: this.myComment,
-                userId: this.form.userId,
+                userId: this.user.userId,
                 articleId: this.articleNo
             }).then(res => {
                 this.$router.go(); // refresh

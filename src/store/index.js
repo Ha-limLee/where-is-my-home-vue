@@ -12,7 +12,7 @@ export default new Vuex.Store({
   },
   plugins: [
     createPersistedState({
-      paths: ["auth"],
+      paths: ["auth", "board"],
       storage: sessionStorage
     }),
   ],
