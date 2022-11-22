@@ -8,7 +8,7 @@
       <b-row align-h="center">
         <h3>게시글</h3>
       </b-row>
-      <b-table selectable select-mode="single" @row-selected="onRowSelected" stripted hover :items="articles"></b-table>
+      <b-table selectable select-mode="single" @row-selected="onRowSelected" stripted hover :items="articles" :fields="articleFields"></b-table>
     </b-container>
   </div>
 </template>
@@ -45,6 +45,36 @@ export default {
   data() {
     return {
       articles: [],
+      articleFields: [
+        {
+          key: "articlePropName",
+          label: "종류",
+        },
+        {
+          key: "articleNo",
+          label: "번호",
+        },
+        {
+          key: "userId",
+          label: "작성자"
+        },
+        {
+          key: "role",
+          label: ""
+        },
+        {
+          key: "subject",
+          label: "제목",
+        },
+        {
+          key: "hit",
+          label: "조회수",
+        },
+        {
+          key: "registerTime",
+          label: "등록일",
+        }
+      ],
     };
   },
   methods: {
