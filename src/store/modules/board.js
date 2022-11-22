@@ -12,6 +12,7 @@ export default {
     },
     actions: {
         setArticleType({ commit }) {
+            console.log("setArticleType called");
             boardApi.getArticleType()
                 .then(res => {
                     commit("SET_ARTICLE_TYPE", res.data);
