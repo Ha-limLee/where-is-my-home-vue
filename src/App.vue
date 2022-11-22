@@ -7,13 +7,15 @@ import { mapActions, mapState } from "vuex";
 
 export default {
   created() {
-    this.setArticleType();
+    if (!Object.keys(this.articleType).length)
+      this.setArticleType();
   },
   methods: {
     ...mapActions("board", ["setArticleType"])
   },
   computed: {
     ...mapState("auth", ["isLogin"]),
+    ...mapState("board", ["articleType"]),
   },
 };
 </script>
