@@ -41,5 +41,8 @@ export default {
      */
     getBuildingListByKeyword(keyword) {
         return axiosService.get(`/estate/building/keyword/${keyword}`);
+    },
+    getAptListByLocation(lat, lng, distance) {
+        return axiosService.get(`/estate/location/apartment?lat=${lat}&lng=${lng}&distance=${distance}&tableName=houseinfo`);
     }
 };

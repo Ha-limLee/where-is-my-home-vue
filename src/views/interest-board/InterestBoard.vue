@@ -55,7 +55,10 @@
 import MainHeader from '@/components/MainHeader.vue';
 import KakaoMapVue from "@/components/KakaoMap.vue";
 import { estate as estateApi } from '@/api';
+import { Bar } from 'vue-chartjs';
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
 
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 /**
  * @typedef {Object} Interest
@@ -79,6 +82,7 @@ export default {
     components: {
         MainHeader,
         KakaoMapVue,
+        Bar,
     },
     created() {
         estateApi.getInterestLocation()
@@ -230,7 +234,7 @@ export default {
             this.openSidebar = true;
             estateApi.getAptAndTradeById(aptId)
                 .then(({ data }) => {
-                    const { houseInfo, houseDealList } = data;
+                    const { buildingInfo, houseDealList } = data;
                     houseDealList.sort((a, b) => {
                         if (a.dealYear === b.dealYear) {
                             if (a.dealMonth === b.dealMonth) {
@@ -242,7 +246,7 @@ export default {
                             return -(a.dealYear - b.dealYear);
                         }
                     });
-                    this.selected.houseInfo = houseInfo;
+                    this.selected.houseInfo = buildingInfo;
                     this.selected.houseDealList = houseDealList;
                 })
         }

@@ -9,14 +9,19 @@
             <button @click="markApts">marker set 3 (empty)</button>
             <button @click="displayInfoWindow">infowindow</button>
         </div>
-        {{aptList}}
     </div>
 </template>
 
 <script>
+import * as Types from "@/types";
+
 export default {
     props: {
-        "aptList": Array
+        "aptList": Array,
+        /**
+         * @type {Types.Building}
+         */
+        "building": {}
     },
     name: "KakaoMap",
     watch: {
@@ -25,6 +30,13 @@ export default {
                 this.markApts();
             }
         },
+        "building": function (newVal, oldVal) {
+            if (newVal !== oldVal) {
+                console.log(newVal);
+                const address = `${newVal.si} ${newVal.gugun} ${newVal.dong}`;
+                this.markAddresss(address);
+            }
+        }
     },
     data() {
         return {
@@ -43,7 +55,7 @@ export default {
                 [37.49646391248451, 127.02675574250912],
             ],
             markers: [],
-            infowindow: null,
+            infowindows: [],
         };
     },
     mounted() {
@@ -54,7 +66,7 @@ export default {
             /* global kakao */
             script.onload = () => kakao.maps.load(this.initMap);
             script.src =
-                `//dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${process.env.VUE_APP_KAKAOMAP_KEY}`;
+                `//dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${process.env.VUE_APP_KAKAOMAP_KEY}&libraries=services`;
             document.head.appendChild(script);
         }
     },
@@ -69,12 +81,50 @@ export default {
             //지도 객체를 등록합니다.
             //지도 객체는 반응형 관리 대상이 아니므로 initMap에서 선언합니다.
             this.map = new kakao.maps.Map(container, options);
+            this.geocoder = new kakao.maps.services.Geocoder();
         },
         changeSize(size) {
             const container = document.getElementById("map");
             container.style.width = `${size}px`;
             container.style.height = `${size}px`;
             this.map.relayout();
+        },
+        /**
+         * @param {string} address 
+         */
+        markAddresss(address) {
+            if (this.markers.length > 0) {
+                this.markers.forEach((marker) => marker.setMap(null));
+            }
+
+            this.infowindows.forEach(x => {
+                x.setMap(null);
+            });
+
+            this.geocoder.addressSearch(address, (result, status) => {
+                if (status === kakao.maps.services.Status.OK) {
+                    var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+                    // 결과값으로 받은 위치를 마커로 표시합니다
+                    var marker = new kakao.maps.Marker({
+                        map: this.map,
+                        position: coords
+                    });
+
+                    this.markers.push(marker);
+
+                    // 인포윈도우로 장소에 대한 설명을 표시합니다
+                    var infowindow = new kakao.maps.InfoWindow({
+                        content: `<div style="width:150px;text-align:center;padding:6px 0;">아아</div>`
+                    });
+                    infowindow.open(this.map, marker);
+
+                    this.infowindows.push(infowindow);
+
+                    // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
+                    this.map.setCenter(coords);
+                }
+            });
         },
         markApts() {
             if (this.markers.length > 0) {
