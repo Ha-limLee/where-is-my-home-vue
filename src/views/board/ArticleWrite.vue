@@ -53,6 +53,13 @@ export default {
                     text: val.propName,
                     value: val.id
                 }
+            }).filter(x => {
+                if (x.text === "공지사항") {
+                    if (this.$store.state.auth.user.role === "admin")
+                        return true;
+                    return false;
+                }
+                return true;
             });
     },
     data() {
@@ -73,7 +80,6 @@ export default {
             const form = {...this.form};
             boardApi.writeArticle(form)
                 .then(res => {
-                    console.log(res);
                     this.$router.push("/board");
                 })
                 .catch(err => alert("글 등록 실패"));

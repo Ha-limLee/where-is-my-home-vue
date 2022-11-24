@@ -57,6 +57,13 @@ export default {
                     text: val.propName,
                     value: val.id
                 }
+            }).filter(x => {
+                if (x.text === "공지사항") {
+                    if (this.$store.state.auth.user.role === "admin")
+                        return true;
+                    return false;
+                }
+                return true;
             });
         boardApi.getArticleDetail(this.articleNo)
             .then(res => {
@@ -67,7 +74,6 @@ export default {
                 // registerTime: "2022-11-02T02:15:42.000+00:00"
                 // subject: "포스트맨으로 삽입 테스트"
                 // userId: "ssafy"
-                console.log(res.data);
 
                 this.userId = res.data.userId;
 
