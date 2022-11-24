@@ -59,8 +59,8 @@
           ></b-form-input>
         </b-form-group>
 
-        <b-button type="submit" class="mr-2" variant="primary">회원가입</b-button>
-        <b-button type="reset" variant="secondary">초기화</b-button>
+        <b-button type="submit" class="mr-2" variant="outline-primary">회원가입</b-button>
+        <b-button type="reset" variant="outline-secondary">초기화</b-button>
       </b-form>
       <b-card class="mt-3" header="Form Data Result">
         <pre class="m-0">{{ form }}</pre>
