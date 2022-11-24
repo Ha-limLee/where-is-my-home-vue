@@ -4,7 +4,8 @@
         <b-container>
             <h2 class="text-center mt-5 mb-3">건물 주위 아파트 검색</h2>
             <b-row>
-                <b-form-input v-b-tooltip.hover title="지하철역, 버스정류장, 아파트, 주변상권 이름을 입력해주세요" v-model="buildingKeyword" debounce="500"></b-form-input>
+                <b-form-input
+                placeholder="지하철역, 버스정류장, 아파트, 주변상권 이름을 입력해주세요" v-model="buildingKeyword" debounce="500"></b-form-input>
                 <b-dropdown ref="dropdown" variant="link" no-caret toggle-class="text-decoration-none" style="position: relative; top: -15px;">
                     <div style="overflow-y: scroll; height: 300px;">
                         <b-dropdown-item v-for="option, i in options" :key="i" :value="option.value" @click="onOptionClick(option.value)">
@@ -20,17 +21,9 @@
                 </b-dropdown>
                 <!-- <b-form-select v-if="options.length" style="z-index: -1;" v-model="selected" :select-size="4" :options="options"></b-form-select> -->
             </b-row>
-            <div>
+            <b-row>
                 <div id="map"></div>
-                <div class="button-group">
-                    <button @click="changeSize(0)">Hide</button>
-                    <button @click="changeSize(400)">show</button>
-                    <button @click="displayMarker(markerPositions1)">marker set 1</button>
-                    <button @click="displayMarker(markerPositions2)">marker set 2</button>
-                    <button @click="markApts">marker set 3 (empty)</button>
-                    <button @click="displayInfoWindow">infowindow</button>
-                </div>
-            </div>
+            </b-row>
 
             <b-sidebar v-model="openSidebar" id="sidebar-right" title="Sidebar" right shadow width="500px">
                 <div class="px-3 py-2">
@@ -82,6 +75,7 @@ export default {
             } else if (value !== oldValue && this.buildingKeywordChange) {
                 estateApi.getBuildingListByKeyword(value)
                     .then(({ data }) => {
+                        console.log(data);
                         if (data.length) {
                             const buildings = data.map(x => {
                                 return {
@@ -95,6 +89,7 @@ export default {
                                 }
                             });
                             this.options = buildings;
+                            console.log(buildings);
                             this.$refs.dropdown.show(true);
                         } else {
                             this.options = [];
@@ -410,8 +405,8 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
     #map {
-        width: 400px;
-        height: 400px;
+        width: 100%;
+        height: 70vh;
     }
 
     .button-group {
