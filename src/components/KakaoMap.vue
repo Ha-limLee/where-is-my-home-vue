@@ -49,6 +49,7 @@ export default {
             markers: [],
             selectedMarker: null,
             infowindows: [],
+            map: null,
         };
     },
     mounted() {
@@ -74,6 +75,9 @@ export default {
             //지도 객체를 등록합니다.
             //지도 객체는 반응형 관리 대상이 아니므로 initMap에서 선언합니다.
             this.map = new kakao.maps.Map(container, options);
+            kakao.maps.event.addListener(this.map, 'click', (e) => {
+                this.$emit('mapClick', e);
+            });
             this.geocoder = new kakao.maps.services.Geocoder();
         },
         changeSize(size) {

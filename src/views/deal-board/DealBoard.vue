@@ -39,7 +39,7 @@
                 </div>
             </b-row>
 
-            <KakaoMapVue @markerClick="onMarkerClick" :apt-list="this.aptList"></KakaoMapVue>
+            <KakaoMapVue @mapClick="onMapClick" @markerClick="onMarkerClick" :apt-list="this.aptList"></KakaoMapVue>
 
             <b-sidebar v-model="openSidebar" id="sidebar-right" title="매매 정보" right shadow width="500px">
                 <div class="px-3 py-2">
@@ -127,6 +127,13 @@ export default {
         }
     },
     methods: {
+        onMapClick(e) {
+            const latlng = e.latLng;
+            estateApi.getAptListByLocation(latlng.getLat(), latlng.getLng(), 1000)
+                .then(({data}) => {
+                    this.aptList = data;
+                });
+        },
         onMarkerClick(aptId) {
             console.log(aptId);
             estateApi.getAptAndTradeById(aptId)
