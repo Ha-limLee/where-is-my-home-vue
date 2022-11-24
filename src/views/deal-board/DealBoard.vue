@@ -1,6 +1,4 @@
 <template>
-    <div>
-        <MainHeader></MainHeader>
         <b-container>
             <h2 class="text-center mt-5 mb-3">아파트 매매 정보</h2>
             <b-row>
@@ -50,17 +48,14 @@
                 </div>
             </b-sidebar>
         </b-container>
-    </div>
 </template>
 
 <script>
-import MainHeader from '@/components/MainHeader.vue';
 import KakaoMapVue from "@/components/KakaoMap.vue";
 import { estate as estateApi } from '@/api';
 
 export default {
     components: {
-        MainHeader,
         KakaoMapVue
     },
     mounted() {

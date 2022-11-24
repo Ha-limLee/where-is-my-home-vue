@@ -1,6 +1,4 @@
 <template>
-  <div>
-    <main-header></main-header>
     <b-container class="mt-4">
       <b-row align-h="center">
         <h3>로그인</h3>
@@ -45,16 +43,13 @@
         <b-button type="reset" variant="secondary">취소</b-button>
       </b-form>
     </b-container>
-  </div>
 </template>
 
 <script>
-import MainHeader from "@/components/MainHeader.vue";
 import { auth as api } from "@/api";
 import jwt_decode from 'jwt-decode';
 
 export default {
-  components: { MainHeader },
   data() {
     return {
       form: {

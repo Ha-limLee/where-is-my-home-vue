@@ -1,6 +1,4 @@
 <template>
-    <div>
-        <MainHeaderVue></MainHeaderVue>
         <b-container class="mt-4">
             <b-form @submit="onSubmit" @reset="onReset" v-if="show">
                 <b-form-group id="input-group-3" label="종류" label-for="input-3">
@@ -41,17 +39,12 @@
                 <b-button type="reset" variant="danger">취소</b-button>
             </b-form>
         </b-container>
-    </div>
 </template>
 
 <script>
-import MainHeaderVue from '@/components/MainHeader.vue';
 import { board as boardApi } from '@/api';
 
 export default {
-    components: {
-        MainHeaderVue
-    },
     created() {
         this.form.userId = this.$store.state.auth.user.userId;
         this.types = this.$store.state.board.articleType

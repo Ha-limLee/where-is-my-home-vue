@@ -1,6 +1,4 @@
 <template>
-    <div>
-        <MainHeaderVue></MainHeaderVue>
         <b-container class="mt-4">
             <b-form @submit="onSubmit" @reset="onReset" v-if="show">
                 <b-form-group id="input-group-4" label="작성자" label-for="input-3">
@@ -82,18 +80,15 @@
                 </b-container>
             </b-form>
         </b-container>
-    </div>
 </template>
 
 <script>
-import MainHeaderVue from '@/components/MainHeader.vue';
 import ArticleCommentVue from "@/components/ArticleComment.vue";
 import { board as boardApi } from '@/api';
 import { mapState } from "vuex";
 
 export default {
     components: {
-        MainHeaderVue,
         ArticleCommentVue
     },
     computed: {

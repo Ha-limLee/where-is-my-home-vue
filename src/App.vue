@@ -1,11 +1,18 @@
 <template>
-  <router-view />
+  <div>
+    <MainHeaderVue></MainHeaderVue>
+    <router-view />
+  </div>
 </template>
 
 <script>
+import MainHeaderVue from "./components/MainHeader.vue";
 import { mapActions, mapState } from "vuex";
 
 export default {
+  components: {
+    MainHeaderVue
+  },
   created() {
     if (!Object.keys(this.articleType).length)
       this.setArticleType();
@@ -24,4 +31,5 @@ export default {
 .selector-for-some-widget {
   box-sizing: content-box;
 }
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap');
 </style>

@@ -1,6 +1,4 @@
 <template>
-  <div>
-    <MainHeaderVue></MainHeaderVue>
     <b-container class="mt-3">
       <b-row align-h="end">
         <b-button @click="$router.push('/article-write')">글쓰기</b-button>
@@ -13,11 +11,9 @@
         <PaginationVue :next-step="10" :prev-step="10" :max-visible-buttons="10" :total-pages="totalPages" :current-page="currentPage" :per-page="10" @pagechanged="onPageChanged"></PaginationVue>
       </b-row>
     </b-container>
-  </div>
 </template>
 
 <script>
-import MainHeaderVue from "@/components/MainHeader.vue";
 import PaginationVue from "@/components/Pagination.vue";
 import {board as boardApi} from '@/api';
 
@@ -35,7 +31,6 @@ function select(data) {
 
 export default {
   components: {
-    MainHeaderVue,
     PaginationVue,
   },
   created() {

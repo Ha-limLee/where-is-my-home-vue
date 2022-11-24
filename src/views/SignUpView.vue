@@ -1,6 +1,4 @@
 <template>
-  <div>
-    <MainHeaderVue />
     <b-container class="mt-4">
       <b-row align-h="center">
         <h3>회원가입</h3>
@@ -68,17 +66,12 @@
         <pre class="m-0">{{ form }}</pre>
       </b-card>
     </b-container>
-  </div>
 </template>
 
 <script>
-import MainHeaderVue from "@/components/MainHeader.vue";
 import { auth as api } from "@/api";
 
 export default {
-  components: {
-    MainHeaderVue,
-  },
   data() {
     return {
       form: {

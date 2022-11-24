@@ -1,6 +1,4 @@
 <template>
-  <div>
-    <MainHeaderVue />
     <b-container class="mt-4">
       <b-row align-h="center">
         <h3>내 정보</h3>
@@ -101,18 +99,13 @@
         </b-row>
       </b-form>
     </b-container>
-  </div>
 </template>
 
 <script>
-import MainHeaderVue from "@/components/MainHeader.vue";
 import { auth as api } from "@/api";
 import { mapMutations } from "vuex";
 
 export default {
-  components: {
-    MainHeaderVue,
-  },
   created() {
     api
       .getUser()

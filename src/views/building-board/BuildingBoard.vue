@@ -1,6 +1,4 @@
 <template>
-    <div>
-        <MainHeader></MainHeader>
         <b-container>
             <h2 class="text-center mt-5 mb-3">건물 주위 아파트 검색</h2>
             <b-row>
@@ -34,11 +32,9 @@
             </b-sidebar>
     
         </b-container>
-    </div>
 </template>
 
 <script>
-import MainHeader from '@/components/MainHeader.vue';
 import KakaoMapVue from "@/components/KakaoMap.vue";
 import { estate as estateApi } from '@/api';
 import * as Types from "@/types";
@@ -53,7 +49,6 @@ import * as Types from "@/types";
 
 export default {
     components: {
-        MainHeader,
         KakaoMapVue,
     },
     mounted() {

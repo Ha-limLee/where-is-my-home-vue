@@ -1,5 +1,5 @@
 <template>
-  <b-navbar toggleable="lg" type="dark" variant="info">
+  <b-navbar toggleable="lg" type="light" variant="light">
     <b-img width="80" :src="require('@/assets/image/ssafy_logo.png')"/>
     <b-navbar-brand to="/">구해줘 홈즈</b-navbar-brand>
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
@@ -52,3 +52,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+  .navbar.navbar-light.bg-light {
+    background-color: aliceblue !important;
+  }
+</style>
