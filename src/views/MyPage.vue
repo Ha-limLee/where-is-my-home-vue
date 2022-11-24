@@ -65,11 +65,11 @@
           ></b-form-input>
         </b-form-group>
         <b-row>
-          <b-button type="submit" class="mr-2 ml-3" variant="primary"
+          <b-button type="submit" class="mr-2 ml-3" variant="outline-primary"
             >수정</b-button
           >
-          <b-button type="reset" variant="secondary">초기화</b-button>
-          <b-button class="ml-auto mr-3" v-b-modal.modal-1 variant="danger"
+          <b-button type="reset" variant="outline-secondary">초기화</b-button>
+          <b-button class="ml-auto mr-3" v-b-modal.modal-1 variant="outline-danger"
             >회원탈퇴</b-button
           >
           <b-modal id="modal-1" title="회원탈퇴" hide-footer>

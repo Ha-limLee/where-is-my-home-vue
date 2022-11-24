@@ -70,12 +70,12 @@
             
             <b-form @submit="onWriteComment">
                 <b-form-textarea
-                    placeholder="댓글"
+                    placeholder="댓글을 입력해주세요"
                     v-model="myComment"
                 ></b-form-textarea>
-                <b-container class="mt-2">
+                <b-container class="mt-2 mb-2">
                     <b-row align-h="end">
-                        <b-button type="submit">댓글 쓰기</b-button>
+                        <b-button :disabled="myComment ? false : true" type="submit" variant="outline-primary">댓글 쓰기</b-button>
                     </b-row>
                 </b-container>
             </b-form>

@@ -1,7 +1,7 @@
 <template>
     <b-container class="mt-3">
       <b-row align-h="end">
-        <b-button @click="$router.push('/article-write')">글쓰기</b-button>
+        <b-button variant="outline-primary" @click="$router.push('/article-write')">글쓰기</b-button>
       </b-row>
       <b-row align-h="center">
         <h3>게시글</h3>

@@ -35,8 +35,8 @@
                     ></b-form-textarea>
                 </b-form-group>
 
-                <b-button type="submit" variant="primary" class="mr-2">등록</b-button>
-                <b-button type="reset" variant="danger">취소</b-button>
+                <b-button type="submit" variant="outline-primary" class="mr-2">등록</b-button>
+                <b-button type="reset" variant="outline-danger">취소</b-button>
             </b-form>
         </b-container>
 </template>
