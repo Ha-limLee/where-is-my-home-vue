@@ -23,7 +23,7 @@
                 <div id="map"></div>
             </b-row>
 
-            <b-sidebar v-model="openSidebar" id="sidebar-right" title="Sidebar" right shadow width="500px">
+            <b-sidebar v-model="openSidebar" id="sidebar-right" title="매매 정보" right shadow width="500px">
                 <div class="px-3 py-2">
                     <h4>{{selected.houseInfo.apartmentName}}</h4>
                     <p>{{selected.houseInfo.roadName}} | 건설년도: {{selected.houseInfo.buildyear}}</p>
