@@ -28,13 +28,14 @@
                 </div>
                 <div class="form-group col-md-2">
                     <button @click="onGetClick" type="button" id="list-btn" class="btn btn-outline-primary">
-                        아파트 매매 정보 가져오기</button>
+                        검색
+                    </button>
                 </div>
             </b-row>
             <b-row>
                 <div class="form-group col-md-3">
                     <input v-model="form.keyword" class="form-control" type="text" id="apt-name"
-                        placeholder="아파트 이름을 입력해주세요">
+                        placeholder="아파트 이름 입력">
                 </div>
             </b-row>
 
