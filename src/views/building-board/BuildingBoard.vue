@@ -83,8 +83,7 @@ export default {
                                     value: x,
                                 }
                             });
-                            this.options = buildings;
-                            console.log(buildings);
+                            this.options = buildings.filter(x => Object.keys(x.location).every(key => x.location[key]));
                             this.$refs.dropdown.show(true);
                         } else {
                             this.options = [];
