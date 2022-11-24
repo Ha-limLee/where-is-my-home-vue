@@ -128,7 +128,7 @@ export default {
             const remains = this.totalPages - this.currentPage;
             if (remains < this.maxVisibleButtons) {
                 const padding = this.maxVisibleButtons - remains;
-                return this.currentPage - padding;
+                return this.currentPage - padding + 1;
             }
 
             return this.currentPage - 1;
