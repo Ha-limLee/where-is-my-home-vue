@@ -6,6 +6,15 @@
       <b-row align-h="center">
         <h3>게시글</h3>
       </b-row>
+      <b-row>
+        <b-col>
+          <b-form-select v-model="selected" @change="onOptionChange" :options="options" size="sm" class="mt-3"></b-form-select>
+        </b-col>
+        <b-col>
+        </b-col>
+        <b-col>
+        </b-col>
+      </b-row>
       <b-table selectable select-mode="single" @row-selected="onRowSelected" stripted hover :items="articles" :fields="articleFields"></b-table>
       <b-row align-h="center">
         <PaginationVue :next-step="10" :prev-step="10" :max-visible-buttons="10" :total-pages="totalPages" :current-page="currentPage" :per-page="10" @pagechanged="onPageChanged"></PaginationVue>
@@ -78,6 +87,12 @@ export default {
         }
       ],
       currentPage: 1,
+      options: [
+        {value: "", text: "전체"},
+        {value: "공지사항", text: "공지사항"},
+        {value: "질문", text: "질문"},
+        {value: "일반", text: "일반"}],
+      selected: "",
     };
   },
   methods: {
@@ -87,8 +102,19 @@ export default {
     },
     onPageChanged(page) {
       this.currentPage = page;
-      boardApi.getArticle("", page - 1)
+      boardApi.getArticle(this.selected, page - 1)
         .then(res => {
+          this.totalPages = res.data.maxPage;
+          const selected = res.data.articleList.map(select);
+          const notice = selected.filter(x => x.articlePropName === "공지사항").map(x => { x._rowVariant = "danger"; return x; }).sort((a, b) => -(a.articleNo - b.articleNo));
+          const general = selected.filter(x => x.articlePropName !== "공지사항").sort((a, b) => -(a.articleNo - b.articleNo));
+          this.articles = [...notice, ...general];
+        });
+    },
+    onOptionChange(val) {
+      boardApi.getArticle(val, 0)
+        .then(res => {
+          this.currentPage = 1;
           this.totalPages = res.data.maxPage;
           const selected = res.data.articleList.map(select);
           const notice = selected.filter(x => x.articlePropName === "공지사항").map(x => { x._rowVariant = "danger"; return x; }).sort((a, b) => -(a.articleNo - b.articleNo));
