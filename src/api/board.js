@@ -20,6 +20,7 @@ export default {
         return axiosService.post("board", form);
     },
     editArticle(articleNo, form) {
+        console.log(form);
         return axiosService.put(`board/${articleNo}`, form);
     },
     deleteArticle(articleNo) {

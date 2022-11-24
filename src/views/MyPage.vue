@@ -149,20 +149,21 @@ export default {
     },
     onResign(event) {
       event.preventDefault();
-      if (this.$store.state.auth.user.userPassword === this.passwordCheck) {
-        api
-          .resignUser(this.$store.state.auth.user.userId)
-          .then((res) => {
-            alert("회원탈퇴 완료");
-            this.SET_USER({});
-            this.$router.push("/");
-          })
-          .catch((reason) => {
-            alert("회원탈퇴 중 오류가 발생했습니다.");
-          });
-      } else {
-        alert("비밀번호가 다릅니다");
-      }
+      api.checkPassword({password: this.passwordCheck})
+        .then(res => {
+          api
+            .resignUser(this.$store.state.auth.user.userId)
+            .then((res) => {
+              alert("회원탈퇴 완료");
+              this.SET_USER({});
+              this.$router.push("/");
+            })
+            .catch((reason) => {
+              alert("회원탈퇴 중 오류가 발생했습니다.");
+            });
+        }).catch(err => {
+          alert("비밀번호가 다릅니다");
+        });
     },
   },
 };

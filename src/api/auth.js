@@ -25,4 +25,7 @@ export default {
   getUserList() {
     return axiosService.get("users/user-public");
   },
+  checkPassword(password) {
+    return axiosService.post("users/passwordCheck", password);
+  }
 };
