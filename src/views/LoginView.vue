@@ -1,6 +1,4 @@
 <template>
-  <div>
-    <main-header></main-header>
     <b-container class="mt-4">
       <b-row align-h="center">
         <h3>로그인</h3>
@@ -31,7 +29,7 @@
           ></b-form-input>
         </b-form-group>
 
-        <b-form-group id="input-group-4" v-slot="{ ariaDescribedby }">
+        <!-- <b-form-group id="input-group-4" v-slot="{ ariaDescribedby }">
           <b-form-checkbox-group
             v-model="form.checked"
             id="checkboxes-4"
@@ -39,22 +37,19 @@
           >
             <b-form-checkbox value="saveId">아이디 저장</b-form-checkbox>
           </b-form-checkbox-group>
-        </b-form-group>
+        </b-form-group> -->
 
         <b-button type="submit" variant="primary" class="mr-2">로그인</b-button>
         <b-button type="reset" variant="secondary">취소</b-button>
       </b-form>
     </b-container>
-  </div>
 </template>
 
 <script>
-import MainHeader from "@/components/MainHeader.vue";
 import { auth as api } from "@/api";
 import jwt_decode from 'jwt-decode';
 
 export default {
-  components: { MainHeader },
   data() {
     return {
       form: {
@@ -75,7 +70,7 @@ export default {
          * @type { {exp: number, id: string, role: string, sub: string, username: string} }
          */
         const decoded = jwt_decode(accessToken);
-
+        console.log(decoded);
         this.$store.commit("auth/SET_IS_LOGIN", true);
         this.$store.commit("auth/SET_IS_LOGIN_ERROR", false);
         this.$store.commit("auth/SET_USER", {

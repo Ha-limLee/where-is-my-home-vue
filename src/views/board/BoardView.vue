@@ -1,9 +1,7 @@
 <template>
-  <div>
-    <MainHeaderVue></MainHeaderVue>
     <b-container class="mt-3">
       <b-row align-h="end">
-        <b-button @click="$router.push('/article-write')">글쓰기</b-button>
+        <b-button variant="outline-primary" @click="$router.push('/article-write')">글쓰기</b-button>
       </b-row>
       <b-row align-h="center">
         <h3>게시글</h3>
@@ -13,20 +11,18 @@
         <PaginationVue :next-step="10" :prev-step="10" :max-visible-buttons="10" :total-pages="totalPages" :current-page="currentPage" :per-page="10" @pagechanged="onPageChanged"></PaginationVue>
       </b-row>
     </b-container>
-  </div>
 </template>
 
 <script>
-import MainHeaderVue from "@/components/MainHeader.vue";
 import PaginationVue from "@/components/Pagination.vue";
 import {board as boardApi} from '@/api';
 
 function select(data) {
-  const {articlePropName, articleNo, userId, subject, hit, registerTime} = data;
+  const {articlePropName, articleNo, userId, userRole, subject, hit, registerTime} = data;
   return {
     articlePropName,
     articleNo,
-    userId,
+    userId : (userRole === "admin") ? (userId + ` (${userRole})`) : userId,
     subject,
     hit,
     registerTime
@@ -35,7 +31,6 @@ function select(data) {
 
 export default {
   components: {
-    MainHeaderVue,
     PaginationVue,
   },
   created() {
@@ -66,7 +61,7 @@ export default {
           label: "작성자"
         },
         {
-          key: "role",
+          key: "userRole",
           label: ""
         },
         {

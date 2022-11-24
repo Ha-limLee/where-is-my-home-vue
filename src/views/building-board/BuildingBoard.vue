@@ -1,6 +1,4 @@
 <template>
-    <div>
-        <MainHeader></MainHeader>
         <b-container>
             <h2 class="text-center mt-5 mb-3">건물 주위 아파트 검색</h2>
             <b-row>
@@ -25,7 +23,7 @@
                 <div id="map"></div>
             </b-row>
 
-            <b-sidebar v-model="openSidebar" id="sidebar-right" title="Sidebar" right shadow width="500px">
+            <b-sidebar v-model="openSidebar" id="sidebar-right" title="매매 정보" right shadow width="500px">
                 <div class="px-3 py-2">
                     <h4>{{selected.houseInfo.apartmentName}}</h4>
                     <p>{{selected.houseInfo.roadName}} | 건설년도: {{selected.houseInfo.buildyear}}</p>
@@ -34,11 +32,9 @@
             </b-sidebar>
     
         </b-container>
-    </div>
 </template>
 
 <script>
-import MainHeader from '@/components/MainHeader.vue';
 import KakaoMapVue from "@/components/KakaoMap.vue";
 import { estate as estateApi } from '@/api';
 import * as Types from "@/types";
@@ -53,7 +49,6 @@ import * as Types from "@/types";
 
 export default {
     components: {
-        MainHeader,
         KakaoMapVue,
     },
     mounted() {
@@ -88,8 +83,7 @@ export default {
                                     value: x,
                                 }
                             });
-                            this.options = buildings;
-                            console.log(buildings);
+                            this.options = buildings.filter(x => Object.keys(x.location).every(key => x.location[key]));
                             this.$refs.dropdown.show(true);
                         } else {
                             this.options = [];

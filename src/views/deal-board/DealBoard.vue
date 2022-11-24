@@ -1,6 +1,4 @@
 <template>
-    <div>
-        <MainHeader></MainHeader>
         <b-container>
             <h2 class="text-center mt-5 mb-3">아파트 매매 정보</h2>
             <b-row>
@@ -30,17 +28,18 @@
                 </div>
                 <div class="form-group col-md-2">
                     <button @click="onGetClick" type="button" id="list-btn" class="btn btn-outline-primary">
-                        아파트 매매 정보 가져오기</button>
+                        검색
+                    </button>
                 </div>
             </b-row>
             <b-row>
                 <div class="form-group col-md-3">
                     <input v-model="form.keyword" class="form-control" type="text" id="apt-name"
-                        placeholder="아파트 이름을 입력해주세요">
+                        placeholder="아파트 이름 입력">
                 </div>
             </b-row>
 
-            <KakaoMapVue @markerClick="onMarkerClick" :apt-list="this.aptList"></KakaoMapVue>
+            <KakaoMapVue @mapClick="onMapClick" @markerClick="onMarkerClick" :apt-list="this.aptList"></KakaoMapVue>
 
             <b-sidebar v-model="openSidebar" id="sidebar-right" title="매매 정보" right shadow width="500px">
                 <div class="px-3 py-2">
@@ -50,17 +49,14 @@
                 </div>
             </b-sidebar>
         </b-container>
-    </div>
 </template>
 
 <script>
-import MainHeader from '@/components/MainHeader.vue';
 import KakaoMapVue from "@/components/KakaoMap.vue";
 import { estate as estateApi } from '@/api';
 
 export default {
     components: {
-        MainHeader,
         KakaoMapVue
     },
     mounted() {
@@ -131,6 +127,13 @@ export default {
         }
     },
     methods: {
+        onMapClick(e) {
+            const latlng = e.latLng;
+            estateApi.getAptListByLocation(latlng.getLat(), latlng.getLng(), 1000)
+                .then(({data}) => {
+                    this.aptList = data;
+                });
+        },
         onMarkerClick(aptId) {
             console.log(aptId);
             estateApi.getAptAndTradeById(aptId)

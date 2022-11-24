@@ -3,7 +3,7 @@ import { board as boardApi } from "@/api";
 export default {
     namespaced: true,
     state: {
-        articleType: {}
+        articleType: [],
     },
     mutations: {
         SET_ARTICLE_TYPE(state, payload) {
@@ -12,7 +12,6 @@ export default {
     },
     actions: {
         setArticleType({ commit }) {
-            console.log("setArticleType called");
             boardApi.getArticleType()
                 .then(res => {
                     commit("SET_ARTICLE_TYPE", res.data);

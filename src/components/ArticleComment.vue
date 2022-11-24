@@ -1,7 +1,7 @@
 <template>
     <div>
         <div>
-            {{comment.userId}}
+            {{comment.userId}} <span v-if="comment.userRole === 'admin'">({{comment.userRole}})</span>
         </div>
         <b-form-textarea
             v-model="text"

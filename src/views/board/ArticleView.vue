@@ -1,6 +1,4 @@
 <template>
-    <div>
-        <MainHeaderVue></MainHeaderVue>
         <b-container class="mt-4">
             <b-form @submit="onSubmit" @reset="onReset" v-if="show">
                 <b-form-group id="input-group-4" label="작성자" label-for="input-3">
@@ -72,28 +70,25 @@
             
             <b-form @submit="onWriteComment">
                 <b-form-textarea
-                    placeholder="댓글"
+                    placeholder="댓글을 입력해주세요"
                     v-model="myComment"
                 ></b-form-textarea>
-                <b-container class="mt-2">
+                <b-container class="mt-2 mb-2">
                     <b-row align-h="end">
-                        <b-button type="submit">댓글 쓰기</b-button>
+                        <b-button :disabled="myComment ? false : true" type="submit" variant="outline-primary">댓글 쓰기</b-button>
                     </b-row>
                 </b-container>
             </b-form>
         </b-container>
-    </div>
 </template>
 
 <script>
-import MainHeaderVue from '@/components/MainHeader.vue';
 import ArticleCommentVue from "@/components/ArticleComment.vue";
 import { board as boardApi } from '@/api';
 import { mapState } from "vuex";
 
 export default {
     components: {
-        MainHeaderVue,
         ArticleCommentVue
     },
     computed: {

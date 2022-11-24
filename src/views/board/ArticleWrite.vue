@@ -1,6 +1,4 @@
 <template>
-    <div>
-        <MainHeaderVue></MainHeaderVue>
         <b-container class="mt-4">
             <b-form @submit="onSubmit" @reset="onReset" v-if="show">
                 <b-form-group id="input-group-3" label="종류" label-for="input-3">
@@ -37,21 +35,16 @@
                     ></b-form-textarea>
                 </b-form-group>
 
-                <b-button type="submit" variant="primary" class="mr-2">등록</b-button>
-                <b-button type="reset" variant="danger">취소</b-button>
+                <b-button type="submit" variant="outline-primary" class="mr-2">등록</b-button>
+                <b-button type="reset" variant="outline-danger">취소</b-button>
             </b-form>
         </b-container>
-    </div>
 </template>
 
 <script>
-import MainHeaderVue from '@/components/MainHeader.vue';
 import { board as boardApi } from '@/api';
 
 export default {
-    components: {
-        MainHeaderVue
-    },
     created() {
         this.form.userId = this.$store.state.auth.user.userId;
         this.types = this.$store.state.board.articleType
@@ -60,6 +53,13 @@ export default {
                     text: val.propName,
                     value: val.id
                 }
+            }).filter(x => {
+                if (x.text === "공지사항") {
+                    if (this.$store.state.auth.user.role === "admin")
+                        return true;
+                    return false;
+                }
+                return true;
             });
     },
     data() {
@@ -80,7 +80,6 @@ export default {
             const form = {...this.form};
             boardApi.writeArticle(form)
                 .then(res => {
-                    console.log(res);
                     this.$router.push("/board");
                 })
                 .catch(err => alert("글 등록 실패"));

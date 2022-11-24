@@ -1,18 +1,11 @@
 <template>
-    <div>
-        <MainHeaderVue></MainHeaderVue>
-        <b-table striped hover :items="users"></b-table>
-    </div>
+    <b-table striped hover :items="users"></b-table>
 </template>
 
 <script>
-import MainHeaderVue from "@/components/MainHeader.vue";
 import { auth as api } from "@/api";
 
 export default {
-    components: {
-        MainHeaderVue
-    },
     data() {
         return {
             users: []

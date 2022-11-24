@@ -18,8 +18,6 @@ const auth = {
   getters: {},
   mutations: {
     SET_USER(state, payload) {
-      console.log("here SET_USER");
-      console.log(payload);
       state.user = { ...payload };
     },
     SET_IS_LOGIN(state, payload) {

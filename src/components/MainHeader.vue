@@ -1,7 +1,7 @@
 <template>
-  <b-navbar toggleable="lg" type="dark" variant="info">
-    <b-img width="80" :src="require('@/assets/image/ssafy_logo.png')"/>
-    <b-navbar-brand to="/">구해줘 홈즈</b-navbar-brand>
+  <b-navbar toggleable="lg" type="light" variant="light">
+    <b-navbar-brand to="/"><b-img width="50" :src="require('@/assets/image/logo.png')"/></b-navbar-brand>
+    <b-navbar-brand to="/" style="font-family: 'Source Code Pro'">Take Me Home</b-navbar-brand>
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
@@ -52,3 +52,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+  .navbar.navbar-light.bg-light {
+    background-color: aliceblue !important;
+  }
+</style>

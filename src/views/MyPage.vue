@@ -1,6 +1,4 @@
 <template>
-  <div>
-    <MainHeaderVue />
     <b-container class="mt-4">
       <b-row align-h="center">
         <h3>내 정보</h3>
@@ -67,11 +65,11 @@
           ></b-form-input>
         </b-form-group>
         <b-row>
-          <b-button type="submit" class="mr-2 ml-3" variant="primary"
+          <b-button type="submit" class="mr-2 ml-3" variant="outline-primary"
             >수정</b-button
           >
-          <b-button type="reset" variant="secondary">초기화</b-button>
-          <b-button class="ml-auto mr-3" v-b-modal.modal-1 variant="danger"
+          <b-button type="reset" variant="outline-secondary">초기화</b-button>
+          <b-button class="ml-auto mr-3" v-b-modal.modal-1 variant="outline-danger"
             >회원탈퇴</b-button
           >
           <b-modal id="modal-1" title="회원탈퇴" hide-footer>
@@ -101,18 +99,13 @@
         </b-row>
       </b-form>
     </b-container>
-  </div>
 </template>
 
 <script>
-import MainHeaderVue from "@/components/MainHeader.vue";
 import { auth as api } from "@/api";
 import { mapMutations } from "vuex";
 
 export default {
-  components: {
-    MainHeaderVue,
-  },
   created() {
     api
       .getUser()
@@ -156,20 +149,21 @@ export default {
     },
     onResign(event) {
       event.preventDefault();
-      if (this.$store.state.auth.user.userPassword === this.passwordCheck) {
-        api
-          .resignUser(this.$store.state.auth.user.userId)
-          .then((res) => {
-            alert("회원탈퇴 완료");
-            this.SET_USER({});
-            this.$router.push("/");
-          })
-          .catch((reason) => {
-            alert("회원탈퇴 중 오류가 발생했습니다.");
-          });
-      } else {
-        alert("비밀번호가 다릅니다");
-      }
+      api.checkPassword({password: this.passwordCheck})
+        .then(res => {
+          api
+            .resignUser(this.$store.state.auth.user.userId)
+            .then((res) => {
+              alert("회원탈퇴 완료");
+              this.SET_USER({});
+              this.$router.push("/");
+            })
+            .catch((reason) => {
+              alert("회원탈퇴 중 오류가 발생했습니다.");
+            });
+        }).catch(err => {
+          alert("비밀번호가 다릅니다");
+        });
     },
   },
 };
