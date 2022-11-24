@@ -18,11 +18,11 @@ import PaginationVue from "@/components/Pagination.vue";
 import {board as boardApi} from '@/api';
 
 function select(data) {
-  const {articlePropName, articleNo, userId, subject, hit, registerTime} = data;
+  const {articlePropName, articleNo, userId, userRole, subject, hit, registerTime} = data;
   return {
     articlePropName,
     articleNo,
-    userId,
+    userId : (userRole === "admin") ? (userId + ` (${userRole})`) : userId,
     subject,
     hit,
     registerTime
@@ -61,7 +61,7 @@ export default {
           label: "작성자"
         },
         {
-          key: "role",
+          key: "userRole",
           label: ""
         },
         {
