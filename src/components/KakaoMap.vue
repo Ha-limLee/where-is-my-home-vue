@@ -1,14 +1,6 @@
 <template>
     <div>
         <div id="map"></div>
-        <div class="button-group">
-            <button @click="changeSize(0)">Hide</button>
-            <button @click="changeSize(400)">show</button>
-            <button @click="displayMarker(markerPositions1)">marker set 1</button>
-            <button @click="displayMarker(markerPositions2)">marker set 2</button>
-            <button @click="markApts">marker set 3 (empty)</button>
-            <button @click="displayInfoWindow">infowindow</button>
-        </div>
     </div>
 </template>
 
@@ -241,8 +233,8 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
     #map {
-        width: 400px;
-        height: 400px;
+        width: 100%;
+        height: 60vh;
     }
 
     .button-group {

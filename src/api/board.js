@@ -7,8 +7,8 @@ export default {
     /**
      * @param {"question" | "notice" | "normal" | ""} type 
      */
-    getArticle(type) {
-        return axiosService.get(`board?type=${type}`);
+    getArticle(type, page) {
+        return axiosService.get(`board?type=${type}&page=${page}`);
     },
     getArticleDetail(articleNo) {
         return axiosService.get(`board/${articleNo}`);

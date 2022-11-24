@@ -34,43 +34,21 @@
                 </div>
             </b-row>
             <b-row>
-                <div class="form-group col-md-2">
-                    <select id="sort-order" name="sort-order" class="form-select" aria-label="Default select example">
-                    <option selected>정렬 순서 선택</option>
-                    <option value="1">오름차순</option>
-                    <option value="2">내림차순</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-2">
-                    <select id="sort-type" name="sort-type" class="form-select" aria-label="Default select example">
-                    <option selected>정렬 기준 선택</option>
-                    <option value="1">아파트이름</option>
-                    <option value="2">층</option>
-                    <option value="3">면적</option>
-                    <option value="4">거래금액</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-1">
-                    <button id="sort-btn" type="button" class="btn btn-outline-secondary">
-                        정렬
-                    </button>
-                </div>
-                
                 <div class="form-group col-md-3">
                     <input v-model="form.keyword" class="form-control" type="text" id="apt-name"
                         placeholder="아파트 이름을 입력해주세요">
                 </div>
             </b-row>
 
-            <b-card class="mt-3" header="Form Data Result">
-                <pre class="m-0">{{ form }}</pre>
-            </b-card>
-            
-            <b-row>
-                <b-table striped hover :items="aptList" :fields="fields"></b-table>
-            </b-row>
+            <KakaoMapVue @markerClick="onMarkerClick" :apt-list="this.aptList"></KakaoMapVue>
 
-            <KakaoMapVue :apt-list="this.aptList"></KakaoMapVue>
+            <b-sidebar v-model="openSidebar" id="sidebar-right" title="매매 정보" right shadow width="500px">
+                <div class="px-3 py-2">
+                    <h4>{{selected.houseInfo.apartmentName}}</h4>
+                    <p>{{selected.houseInfo.roadName}} | 건설년도: {{selected.houseInfo.buildyear}}</p>
+                    <b-table :items="selected.houseDealList" :fields="selected.fields"></b-table>
+                </div>
+            </b-sidebar>
         </b-container>
     </div>
 </template>
@@ -100,27 +78,48 @@ export default {
                 getDongInfo(this);
             });
             // document.querySelector("#list-btn").addEventListener("click", fetchFromDB);
-            document.querySelector("#sort-btn").addEventListener("click", sortFromDB);
+            // document.querySelector("#sort-btn").addEventListener("click", sortFromDB);
         });
     },
     data() {
         return {
-            aptList: [],
-            /**
-             * @type {[{key: string, label: string, sortable: boolean, variant?: string}]}
-             */
-            fields: [
-                {
-                    key: "aptName",
-                    label: "아파트 이름",
-                    sortable: true,
+            selected: {
+                houseInfo: {
+                    apartmentName: "",
+                    roadName: "",
+                    buildyear: "",
                 },
-                {
-                    key: "price",
-                    label: "가격",
-                    sortable: true,
-                }
-            ],
+                houseDealList: [],
+                fields: [
+                    {
+                        key: "dealYear",
+                        label: "년",
+                        sortable: true,
+                    },
+                    {
+                        key: "dealMonth",
+                        label: "월",
+                        sortable: true,
+                    },
+                    {
+                        key: "dealDay",
+                        label: "일",
+                        sortable: true,
+                    },
+                    {
+                        key: "dealAmount",
+                        label: "거래가격",
+                        sortable: true,
+                    },
+                    {
+                        key: "floor",
+                        label: "층수",
+                        sortable: true,
+                    }
+                ],
+            },
+            openSidebar: false,
+            aptList: [],
             form: {
                 si: "",
                 gugun: "",
@@ -132,6 +131,27 @@ export default {
         }
     },
     methods: {
+        onMarkerClick(aptId) {
+            console.log(aptId);
+            estateApi.getAptAndTradeById(aptId)
+                .then(({ data }) => {
+                    const { buildingInfo, houseDealList } = data;
+                    houseDealList.sort((a, b) => {
+                        if (a.dealYear === b.dealYear) {
+                            if (a.dealMonth === b.dealMonth) {
+                                return -(a.dealDay - b.dealDay);
+                            } else {
+                                return -(a.dealMonth - b.dealMonth);
+                            }
+                        } else {
+                            return -(a.dealYear - b.dealYear);
+                        }
+                    });
+                    this.selected.houseInfo = buildingInfo;
+                    this.selected.houseDealList = houseDealList;
+                    this.openSidebar = true;
+                });
+        },
         onSidoSelected(e) {
             const selectedIndex = e.target.options.selectedIndex;
             let name = "";

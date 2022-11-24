@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <MainHeaderVue />
-    <b-img :src="require('../assets/image/main.png')" fluid-grow />
+    <b-img :src="require('../assets/image/main.jpg')" fluid-grow/>
   </div>
 </template>
 
@@ -16,3 +16,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+  #main-img {
+    width: 100%;
+    height: calc(100% - 80px);
+  }
+</style>

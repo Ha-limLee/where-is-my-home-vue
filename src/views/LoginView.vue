@@ -44,9 +44,6 @@
         <b-button type="submit" variant="primary" class="mr-2">로그인</b-button>
         <b-button type="reset" variant="secondary">취소</b-button>
       </b-form>
-      <b-card class="mt-3" header="Form Data Result">
-        <pre class="m-0">{{ form }}</pre>
-      </b-card>
     </b-container>
   </div>
 </template>
