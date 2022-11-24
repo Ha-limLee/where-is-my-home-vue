@@ -1,8 +1,5 @@
 <template>
-  <div class="home">
-    <MainHeaderVue />
-    <b-img :src="require('../assets/image/main.jpg')" fluid-grow/>
-  </div>
+  <img :src="`${publicPath}image/main.jpg`" alt="main image" />
 </template>
 
 <script>
@@ -14,12 +11,20 @@ export default {
   components: {
     MainHeaderVue,
   },
+  data() {
+    return {
+      publicPath: process.env.BASE_URL,
+    }
+  }
 };
 </script>
 
 <style scoped>
-  #main-img {
-    width: 100%;
-    height: calc(100% - 80px);
-  }
+img {
+  position: fixed;
+  right: 0;
+  width: 100%;
+  height: 80%;
+  object-fit: contain;
+}
 </style>
