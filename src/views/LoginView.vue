@@ -78,8 +78,6 @@ export default {
          * @type { {exp: number, id: string, role: string, sub: string, username: string} }
          */
         const decoded = jwt_decode(accessToken);
-        
-        console.log(decoded);
 
         this.$store.commit("auth/SET_IS_LOGIN", true);
         this.$store.commit("auth/SET_IS_LOGIN_ERROR", false);

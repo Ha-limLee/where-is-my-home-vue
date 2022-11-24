@@ -1,5 +1,6 @@
 <template>
   <b-navbar toggleable="lg" type="dark" variant="info">
+    <b-img width="80" :src="require('@/assets/image/ssafy_logo.png')"/>
     <b-navbar-brand to="/">구해줘 홈즈</b-navbar-brand>
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
     <b-collapse id="nav-collapse" is-nav>
