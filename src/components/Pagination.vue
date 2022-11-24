@@ -121,14 +121,16 @@ export default {
 
             // When on the last page
             if (this.currentPage === this.totalPages) {
-                return this.totalPages - this.maxVisibleButtons + 1;
+                const sPage = this.totalPages - this.maxVisibleButtons + 1;
+                return (sPage > 0) ? sPage : 1;
             }
 
             // When inbetween
             const remains = this.totalPages - this.currentPage;
             if (remains < this.maxVisibleButtons) {
                 const padding = this.maxVisibleButtons - remains;
-                return this.currentPage - padding + 1;
+                const sPage = this.currentPage - padding + 1;
+                return (sPage > 0) ? sPage : 1;
             }
 
             return this.currentPage - 1;
