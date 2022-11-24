@@ -36,7 +36,7 @@ export default {
   created() {
     boardApi.getArticle("")
       .then(res => {
-        const selected = res.data.map(select);
+        const selected = res.data.articleList.map(select);
         const notice = selected.filter(x => x.articlePropName === "공지사항").map(x => { x._rowVariant = "danger"; return x; }).sort((a, b) => -(a.articleNo - b.articleNo));
         const general = selected.filter(x => x.articlePropName !== "공지사항").sort((a, b) => -(a.articleNo - b.articleNo));
         this.articles = [...notice, ...general];

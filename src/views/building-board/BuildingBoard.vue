@@ -51,10 +51,6 @@ import { estate as estateApi } from '@/api';
 import * as Types from "@/types";
 
 /**
- * @typedef {Types.Interest} Interest
- */
-
-/**
  * @typedef {Types.SimpleApt} SimpleApt
  */
 
@@ -66,12 +62,6 @@ export default {
     components: {
         MainHeader,
         KakaoMapVue,
-    },
-    created() {
-        estateApi.getInterestLocation()
-            .then(({ data }) => {
-                this.interestList = data;
-            });
     },
     mounted() {
         if (window.kakao && window.kakao.maps) {
@@ -89,7 +79,7 @@ export default {
         buildingKeyword(value, oldValue) {
             if (value === "") {
                 this.options = [];
-            } else if (value !== oldValue) {
+            } else if (value !== oldValue && this.buildingKeywordChange) {
                 estateApi.getBuildingListByKeyword(value)
                     .then(({ data }) => {
                         if (data.length) {
@@ -110,6 +100,8 @@ export default {
                             this.options = [];
                         }
                     });
+            } else if (!this.buildingKeywordChange) {
+                this.buildingKeywordChange = true;
             }
         }
     },
@@ -121,6 +113,9 @@ export default {
              */
             options: [],
             buildingKeyword: "",
+            buildingKeywordChange: true,
+            buildingMarker: null,
+            selectedMarker: null,
             markers: [],
             infowindows: [],
             /**
@@ -141,31 +136,6 @@ export default {
                     key: "price",
                     label: "가격",
                     sortable: true,
-                }
-            ],
-            /**
-             * @type { Interest[] }
-             */
-            interestList: [],
-            interestFields: [
-                {
-                    key: "sidoName",
-                    label: "시/도",
-                    sortable: true,
-                },
-                {
-                    key: "gugunName",
-                    label: "구/군",
-                    sortable: true,
-                },
-                {
-                    key: "dongName",
-                    label: "동",
-                    sortable: true,
-                }, {
-                    key: "action",
-                    label: "",
-                    sortable: false,
                 }
             ],
             openSidebar: false,
@@ -207,7 +177,7 @@ export default {
             const container = document.getElementById("map");
             const options = {
                 center: new kakao.maps.LatLng(33.450701, 126.570667),
-                level: 5,
+                level: 4,
             };
 
             //지도 객체를 등록합니다.
@@ -225,6 +195,9 @@ export default {
          * @param {string} address 
          */
         markAddresss(address) {
+            if (this.buildingMarker) {
+                this.buildingMarker.setMap(null);
+            }
             if (this.markers.length > 0) {
                 this.markers.forEach((marker) => marker.setMap(null));
             }
@@ -248,17 +221,22 @@ export default {
                     kakao.maps.event.addListener(marker, 'click', function () {
                         vueInstance.onBuildingMarkerClick(result[0].y, result[0].x);
                         vueInstance.map.panTo(coords);
+                        const imageSrc = `${process.env.BASE_URL}image/marker/building_marker_click.png`,
+                            imageSize = new kakao.maps.Size(50, 50),
+                            imageOption = { offset: new kakao.maps.Point(25, 50) };
+                        const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+                        marker.setImage(markerImage);
                     });
 
-                    this.markers.push(marker);
+                    this.buildingMarker = marker;
 
                     // 인포윈도우로 장소에 대한 설명을 표시합니다
-                    var infowindow = new kakao.maps.InfoWindow({
-                        content: `<div style="width:150px;text-align:center;padding:6px 0;">아아</div>`
-                    });
-                    infowindow.open(this.map, marker);
+                    // var infowindow = new kakao.maps.InfoWindow({
+                    //     content: `<div style="width:150px;text-align:center;padding:6px 0;">${this.buildingKeyword}</div>`
+                    // });
+                    // infowindow.open(this.map, marker);
 
-                    this.infowindows.push(infowindow);
+                    // this.infowindows.push(infowindow);
 
                     // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
                     this.map.setCenter(coords);
@@ -271,7 +249,6 @@ export default {
             }
 
             if (this.aptList.length) {
-                const vueInstance = this;
                 const map = this.map;
                 const bounds = new kakao.maps.LatLngBounds();
                 for (let i = 0; i < this.aptList.length || 0; i++) {
@@ -279,10 +256,20 @@ export default {
                     const { lat, lng } = apt;
                     const position = new kakao.maps.LatLng(lat, lng);
                     const marker = new kakao.maps.Marker({ map: this.map, position });
-                    
-                    kakao.maps.event.addListener(marker, 'click', function () {
-                        vueInstance.$emit('markerClick', apt.aptCode);
-                        map.panTo(position);
+                    kakao.maps.event.addListener(marker, 'click', () => {
+                        // vueInstance.$emit('markerClick', apt.aptCode);
+                        if (marker != this.selectedMarker || !this.selectedMarker) {
+                            this.onMarkerClick(apt.aptCode);
+                            this.selectedMarker?.setImage(null);
+                            this.selectedMarker = marker;
+                            map.panTo(position);
+                            const imageSrc = `${process.env.BASE_URL}image/marker/marker_click.png`,
+                                imageSize = new kakao.maps.Size(50, 50),
+                                imageOption = { offset: new kakao.maps.Point(25, 50) };
+                            const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+                            
+                            marker.setImage(markerImage);
+                        }
                     });
 
                     this.markers.push(marker);
@@ -310,6 +297,26 @@ export default {
 
             //     this.map.setBounds(bounds);
             // }
+        },
+        onMarkerClick(aptId) {
+            this.openSidebar = true;
+            estateApi.getAptAndTradeById(aptId)
+                .then(({ data }) => {
+                    const { buildingInfo, houseDealList } = data;
+                    houseDealList.sort((a, b) => {
+                        if (a.dealYear === b.dealYear) {
+                            if (a.dealMonth === b.dealMonth) {
+                                return -(a.dealDay - b.dealDay);
+                            } else {
+                                return -(a.dealMonth - b.dealMonth);
+                            }
+                        } else {
+                            return -(a.dealYear - b.dealYear);
+                        }
+                    });
+                    this.selected.houseInfo = buildingInfo;
+                    this.selected.houseDealList = houseDealList;
+                })
         },
         displayMarker(markerPositions) {
             if (this.markers.length > 0) {
@@ -362,16 +369,20 @@ export default {
          */
         onOptionClick(value) {
             this.building = value;
+            this.buildingKeywordChange = false;
+            this.buildingKeyword = value.name;
             const addresss = `${value.si} ${value.gugun} ${value.dong}`;
             this.markAddresss(addresss);
         },
 
         onBuildingMarkerClick(lat, lng) {
-            this.openSidebar = true;
-            estateApi.getAptListByLocation(lat, lng, 1000)
+            estateApi.getAptListByLocation(lat, lng, 500)
                 .then(({ data }) => {
                     this.aptList = data;
                     this.markApts();
+                    // 처음 클릭한 마커가 가장 위로 오도록 한다
+                    this.buildingMarker.setMap(null);
+                    this.buildingMarker.setMap(this.map);
                 })
             // estateApi.getAptAndTradeById(aptId)
             //     .then(({ data }) => {
@@ -391,28 +402,6 @@ export default {
             //         this.selected.houseDealList = houseDealList;
             //     })
         },
-
-        onMarkerClick(aptId) {
-            console.log("마크 눌렀지렁~");
-            this.openSidebar = true;
-            estateApi.getAptAndTradeById(aptId)
-                .then(({ data }) => {
-                    const { houseInfo, houseDealList } = data;
-                    houseDealList.sort((a, b) => {
-                        if (a.dealYear === b.dealYear) {
-                            if (a.dealMonth === b.dealMonth) {
-                                return -(a.dealDay - b.dealDay);
-                            } else {
-                                return -(a.dealMonth - b.dealMonth);
-                            }
-                        } else {
-                            return -(a.dealYear - b.dealYear);
-                        }
-                    });
-                    this.selected.houseInfo = houseInfo;
-                    this.selected.houseDealList = houseDealList;
-                })
-        }
     }
 }
 

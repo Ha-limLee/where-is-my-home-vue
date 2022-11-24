@@ -55,6 +55,7 @@ export default {
                 [37.49646391248451, 127.02675574250912],
             ],
             markers: [],
+            selectedMarker: null,
             infowindows: [],
         };
     },
@@ -147,9 +148,18 @@ export default {
                     const position = new kakao.maps.LatLng(lat, lng);
                     const marker = new kakao.maps.Marker({ map: this.map, position });
                     
-                    kakao.maps.event.addListener(marker, 'click', function () {
-                        vueInstance.$emit('markerClick', apt.aptCode);
-                        map.panTo(position);
+                    kakao.maps.event.addListener(marker, 'click', () => {
+                        if (marker != vueInstance.selectedMarker || !vueInstance.selectedMarker) {
+                            vueInstance.selectedMarker?.setImage(null);
+                            vueInstance.selectedMarker = marker;
+                            vueInstance.$emit('markerClick', apt.aptCode);
+                            const imageSrc = `${process.env.BASE_URL}image/marker/marker_click.png`,
+                                imageSize = new kakao.maps.Size(50, 50),
+                                imageOption = { offset: new kakao.maps.Point(25, 50) };
+                            const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+                            marker.setImage(markerImage);
+                            map.panTo(position);
+                        }
                     });
 
                     this.markers.push(marker);

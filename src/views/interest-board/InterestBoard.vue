@@ -56,8 +56,6 @@ import MainHeader from '@/components/MainHeader.vue';
 import KakaoMapVue from "@/components/KakaoMap.vue";
 import { estate as estateApi } from '@/api';
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
-
 /**
  * @typedef {Object} Interest
  * @property {string} dongCode
@@ -80,11 +78,11 @@ export default {
     components: {
         MainHeader,
         KakaoMapVue,
-        Bar,
     },
     created() {
         estateApi.getInterestLocation()
             .then(({ data }) => {
+                console.log(data);
                 this.interestList = data;
             });
     },
