@@ -3,10 +3,14 @@
     <img :src="`${publicPath}image/main.jpg`" alt="main image" />
     <b-row align-h="center">
       <b-card id="tab-group" no-body>
-        <b-tabs @input="onTabChanged" card v-if="newses.length">
-          <div v-for="subject, i in subjects" :key="i">
-            <b-tab :title="subject" :active="(i === 0) ? true : false">
-              <b-card-text style="overflow:auto; height: 40px;" v-html="headline"></b-card-text>
+        <b-tabs lazy @input="onTabChanged" card v-if="newses.length">
+          <div v-for="(subject, i) in subjects" :key="i">
+            <b-tab :title="subject" :active="i === 0 ? true : false">
+              <b-card-text
+                :class="{ 'news-card': animation }"
+                style="overflow: auto; height: 40px"
+                v-html="headline"
+              ></b-card-text>
             </b-tab>
           </div>
         </b-tabs>
@@ -29,6 +33,8 @@ import { news as newsApi } from "@/api";
  * @property {string} originallink
  */
 
+const duration = 4000;
+
 export default {
   name: "HomeView",
   components: {
@@ -36,47 +42,45 @@ export default {
   },
   computed: {
     headline() {
-      return `<a href="${this.newses[this.currentIndex]?.link}">${this.newses[this.currentIndex]?.title}</a>`
-    }
+      return `<a href="${this.newses[this.currentIndex]?.link}">${
+        this.newses[this.currentIndex]?.title
+      }</a>`;
+    },
   },
   data() {
     return {
       publicPath: process.env.BASE_URL,
       subjects: ["부동산", "금리", "경제", "주식", "아파트"],
-      /** @type {News[]} */ 
+      /** @type {News[]} */
       newses: [],
       currentIndex: 0,
       currentTab: 0,
       interval: null,
-    }
+      animation: false,
+    };
   },
   created() {
     const keyword = this.subjects[this.currentTab];
-    newsApi.getNews(keyword)
-      .then(({data}) => {
-        this.newses = data;
-        this.interval = setInterval(() => {
-          this.currentIndex = (this.currentIndex + 1) % this.newses.length;
-        }, 5000);
-      });
+    newsApi.getNews(keyword).then(({ data }) => {
+      this.newses = data;
+      this.interval = setInterval(() => {
+        this.animation = true;
+        this.currentIndex = (this.currentIndex + 1) % this.newses.length;
+      }, duration);
+    });
   },
   methods: {
     onTabChanged(selectedTab) {
-      if (this.currentTab === selectedTab)
-        return;
+      if (this.currentTab === selectedTab) return;
       this.currentTab = selectedTab;
       const keyword = this.subjects[this.currentTab];
-      newsApi.getNews(keyword)
-        .then(({data}) => {
-          this.currentIndex = 0;
-          this.newses = data;
-          clearInterval(this.interval);
-          this.interval = setInterval(() => {
-            this.currentIndex = (this.currentIndex + 1) % this.newses.length;
-          }, 5000);
-        });
-    }
-  }
+      this.animation = false;
+      newsApi.getNews(keyword).then(({ data }) => {
+        this.currentIndex = 0;
+        this.newses = data;
+      });
+    },
+  },
 };
 </script>
 
@@ -93,5 +97,30 @@ img {
   bottom: 8px;
   width: 100%;
   height: 20%;
+}
+.news-card {
+  animation: up 4000ms ease-in-out infinite, down 4000ms ease-in-out infinite;
+}
+
+@keyframes up {
+  90% {
+    transform: translatey(0px);
+    opacity: 1;
+  }
+  100% {
+    transform: translatey(-20px);
+    opacity: 0;
+  }
+}
+
+@keyframes down {
+  0% {
+    transform: translatey(20px);
+    opacity: 0;
+  }
+  10% {
+    transform: translatey(0px);
+    opacity: 1;
+  }
 }
 </style>
