@@ -3,7 +3,7 @@
     <img :src="`${publicPath}image/main.jpg`" alt="main image" />
     <b-row align-h="center">
       <b-card id="tab-group" no-body>
-        <b-tabs lazy @input="onTabChanged" card v-if="newses.length">
+        <b-tabs @input="onTabChanged" card v-if="newses.length">
           <div v-for="(subject, i) in subjects" :key="i">
             <b-tab :title="subject" :active="i === 0 ? true : false">
               <b-card-text
@@ -65,6 +65,9 @@ export default {
       this.newses = data;
       this.interval = setInterval(() => {
         this.animation = true;
+        setTimeout(() => {
+          this.animation = false;
+        }, 1000);
         this.currentIndex = (this.currentIndex + 1) % this.newses.length;
       }, duration);
     });
@@ -74,7 +77,6 @@ export default {
       if (this.currentTab === selectedTab) return;
       this.currentTab = selectedTab;
       const keyword = this.subjects[this.currentTab];
-      this.animation = false;
       newsApi.getNews(keyword).then(({ data }) => {
         this.currentIndex = 0;
         this.newses = data;
@@ -99,21 +101,10 @@ img {
   height: 20%;
 }
 .news-card {
-  animation: up 4000ms ease-in-out infinite, down 4000ms ease-in-out infinite;
+  animation: up 4000ms ease-in-out infinite;
 }
 
 @keyframes up {
-  90% {
-    transform: translatey(0px);
-    opacity: 1;
-  }
-  100% {
-    transform: translatey(-20px);
-    opacity: 0;
-  }
-}
-
-@keyframes down {
   0% {
     transform: translatey(20px);
     opacity: 0;
