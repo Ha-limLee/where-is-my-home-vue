@@ -39,8 +39,8 @@
           </b-form-checkbox-group>
         </b-form-group> -->
 
-        <b-button type="submit" variant="primary" class="mr-2">로그인</b-button>
-        <b-button type="reset" variant="secondary">취소</b-button>
+        <b-button type="submit" variant="outline-primary" class="mr-2">로그인</b-button>
+        <b-button type="reset" variant="outline-secondary">취소</b-button>
       </b-form>
     </b-container>
 </template>
