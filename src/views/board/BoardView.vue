@@ -15,7 +15,9 @@
         <b-col>
         </b-col>
       </b-row>
+      
       <b-table selectable select-mode="single" @row-selected="onRowSelected" stripted hover :items="articles" :fields="articleFields"></b-table>
+
       <b-row align-h="center">
         <PaginationVue :next-step="10" :prev-step="10" :max-visible-buttons="10" :total-pages="totalPages" :current-page="currentPage" :per-page="10" @pagechanged="onPageChanged"></PaginationVue>
       </b-row>
@@ -26,6 +28,30 @@
 import PaginationVue from "@/components/Pagination.vue";
 import {board as boardApi} from '@/api';
 
+/**
+ * @typedef {Object} Article
+ * @property {number} articleNo
+ * @property {number} articlePropId
+ * @property {string} articlePropName
+ * @property {number} hit
+ * @property {string} registerTime
+ * @property {string} subject
+ * @property {string} userId
+ * @property {string} userRole
+ */
+
+/**
+ * @typedef {Object} ArticleData
+ * @property {Article[]} articleList
+ * @property {number} maxPage
+ * @property {number} maxSize
+ * @property {string} page
+ * @property {string} size
+ */
+
+/**
+ * @param {Article} data
+ */
 function select(data) {
   const {articlePropName, articleNo, userId, userRole, subject, hit, registerTime} = data;
   return {
@@ -43,14 +69,7 @@ export default {
     PaginationVue,
   },
   created() {
-    boardApi.getArticle("", 0)
-      .then(res => {
-        this.totalPages = res.data.maxPage;
-        const selected = res.data.articleList.map(select);
-        const notice = selected.filter(x => x.articlePropName === "공지사항").map(x => { x._rowVariant = "danger"; return x; }).sort((a, b) => -(a.articleNo - b.articleNo));
-        const general = selected.filter(x => x.articlePropName !== "공지사항").sort((a, b) => -(a.articleNo - b.articleNo));
-        this.articles = [...notice, ...general];
-      });
+    this.setArticles("", 1);
   },
   data() {
     return {
@@ -96,31 +115,31 @@ export default {
     };
   },
   methods: {
+    async setArticles(selectedType, page) {
+      if (selectedType === "공지사항") {
+        const articleData = (await boardApi.getArticle(selectedType, page - 1)).data;
+        this.articles = articleData.articleList.map(select).map(x => ({...x, _rowVariant: "danger"}));
+        this.currentPage = page;
+        this.totalPages = articleData.maxPage;
+      } else {
+        const noticeData = (await boardApi.getArticle("공지사항", 0)).data;
+        const notices = noticeData.articleList.map(select).map(x => ({...x, _rowVariant: "danger"}));
+        const articleData = (await boardApi.getArticleNotNotice(selectedType, page - 1)).data;
+        const articles = articleData.articleList.map(select);
+        this.articles = [...notices, ...articles];
+        this.currentPage = page;
+        this.totalPages = articleData.maxPage;
+      }
+    },
     onRowSelected(items) {
       const item = items[0];
       this.$router.push(`/article/${item.articleNo}`);
     },
     onPageChanged(page) {
-      this.currentPage = page;
-      boardApi.getArticle(this.selected, page - 1)
-        .then(res => {
-          this.totalPages = res.data.maxPage;
-          const selected = res.data.articleList.map(select);
-          const notice = selected.filter(x => x.articlePropName === "공지사항").map(x => { x._rowVariant = "danger"; return x; }).sort((a, b) => -(a.articleNo - b.articleNo));
-          const general = selected.filter(x => x.articlePropName !== "공지사항").sort((a, b) => -(a.articleNo - b.articleNo));
-          this.articles = [...notice, ...general];
-        });
+      this.setArticles(this.selected, page);
     },
     onOptionChange(val) {
-      boardApi.getArticle(val, 0)
-        .then(res => {
-          this.currentPage = 1;
-          this.totalPages = res.data.maxPage;
-          const selected = res.data.articleList.map(select);
-          const notice = selected.filter(x => x.articlePropName === "공지사항").map(x => { x._rowVariant = "danger"; return x; }).sort((a, b) => -(a.articleNo - b.articleNo));
-          const general = selected.filter(x => x.articlePropName !== "공지사항").sort((a, b) => -(a.articleNo - b.articleNo));
-          this.articles = [...notice, ...general];
-        });
+      this.setArticles(val, 1);
     }
   }
 };
