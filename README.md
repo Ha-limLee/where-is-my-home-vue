@@ -1,4 +1,5 @@
-# where-is-my-home-vue
+# Take Me Home
+![main-page](./docs/img/main-page.png)
 
 ## Project setup
 ```
