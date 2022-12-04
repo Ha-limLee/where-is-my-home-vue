@@ -16,7 +16,7 @@
         </b-col>
       </b-row>
       
-      <b-table selectable select-mode="single" @row-selected="onRowSelected" stripted hover :items="articles" :fields="articleFields"></b-table>
+      <b-table class="article-table" selectable select-mode="single" @row-selected="onRowSelected" stripted hover :items="articles" :fields="articleFields"></b-table>
 
       <b-row align-h="center">
         <PaginationVue :next-step="10" :prev-step="10" :max-visible-buttons="10" :total-pages="totalPages" :current-page="currentPage" :per-page="10" @pagechanged="onPageChanged"></PaginationVue>
@@ -55,7 +55,7 @@ import {board as boardApi} from '@/api';
 function select(data) {
   const {articlePropName, articleNo, userId, userRole, subject, hit, registerTime} = data;
   return {
-    articlePropName,
+    articlePropName: (articlePropName === "공지사항") ? "🔴" + articlePropName : articlePropName,
     articleNo,
     userId : (userRole === "admin") ? (userId + ` (${userRole})`) : userId,
     subject,
@@ -118,12 +118,12 @@ export default {
     async setArticles(selectedType, page) {
       if (selectedType === "공지사항") {
         const articleData = (await boardApi.getArticle(selectedType, page - 1)).data;
-        this.articles = articleData.articleList.map(select).map(x => ({...x, _rowVariant: "danger"}));
+        this.articles = articleData.articleList.map(select);
         this.currentPage = page;
         this.totalPages = articleData.maxPage;
       } else {
         const noticeData = (await boardApi.getArticle("공지사항", 0)).data;
-        const notices = noticeData.articleList.map(select).map(x => ({...x, _rowVariant: "danger"}));
+        const notices = noticeData.articleList.map(select);
         const articleData = (await boardApi.getArticleNotNotice(selectedType, page - 1)).data;
         const articles = articleData.articleList.map(select);
         this.articles = [...notices, ...articles];
