@@ -3,18 +3,18 @@
     <b-navbar-brand to="/"><b-img width="50" :src="require('@/assets/image/logo.png')"/></b-navbar-brand>
     <b-navbar-brand to="/" style="font-family: 'Source Code Pro'">Take Me Home</b-navbar-brand>
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-    <b-collapse id="nav-collapse" is-nav>
+    <b-collapse ref="" id="nav-collapse" is-nav>
       <b-navbar-nav>
-        <b-nav-item href="/board">게시판</b-nav-item>
-        <b-nav-item href="/deal-board">아파트 매매 정보</b-nav-item>
-        <b-nav-item v-if="user?.userName" href="/interest-board">관심지역</b-nav-item>
-        <b-nav-item href="/building-board">건물검색</b-nav-item>
+        <MainNavItem to="/board">게시판</MainNavItem>
+        <MainNavItem to="/deal-board">아파트 매매 정보</MainNavItem>
+        <MainNavItem v-if="user?.userName" to="/interest-board">관심지역</MainNavItem>
+        <MainNavItem to="/building-board">건물검색</MainNavItem>
       </b-navbar-nav>
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
         <b-navbar-nav v-if="$store.state.auth.user?.userName">
-          <b-nav-item to="/my-page"
-            >안녕하세요 {{ $store.state.auth.user.userName }} 님</b-nav-item
+          <MainNavItem id="item-my-page" to="/my-page"
+            >안녕하세요 {{ $store.state.auth.user.userName }} 님</MainNavItem
           >
           <b-nav-item href="#" @click="onLogout">로그아웃</b-nav-item>
           <template v-if="$store.state.auth.user.authority == 'admin'">
@@ -22,8 +22,8 @@
           </template>
         </b-navbar-nav>
         <b-navbar-nav v-else>
-          <b-nav-item href="/sign-up">회원가입</b-nav-item>
-          <b-nav-item href="/login">로그인</b-nav-item>
+          <MainNavItem to="/sign-up">회원가입</MainNavItem>
+          <MainNavItem to="/login">로그인</MainNavItem>
         </b-navbar-nav>
       </b-navbar-nav>
     </b-collapse>
@@ -32,7 +32,12 @@
 
 <script>
 import { mapMutations, mapState } from "vuex";
+import MainNavItem from "./MainNavItem.vue";
+
 export default {
+  components: {
+    MainNavItem
+  },
   computed: {
     ...mapState("auth", ["isLogin", "user"]),
   },
@@ -54,7 +59,7 @@ export default {
 </script>
 
 <style scoped>
-  .navbar.navbar-light.bg-light {
-    background-color: aliceblue !important;
-  }
+.navbar.navbar-light.bg-light {
+  background-color: aliceblue !important;
+}
 </style>

@@ -93,6 +93,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach(function (to, from, next) {
+  store.commit("curr-router/SET_PATH", to.path);
   if (to.matched.some(function (routeInfo) {
     return routeInfo.meta.authRequired && !store.state.auth.isLogin;
   })) {
