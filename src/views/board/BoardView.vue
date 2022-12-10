@@ -55,7 +55,7 @@ import {board as boardApi} from '@/api';
 function select(data) {
   const {articlePropName, articleNo, userId, userRole, subject, hit, registerTime} = data;
   return {
-    articlePropName: (articlePropName === "공지사항") ? "🔴" + articlePropName : articlePropName,
+    articlePropName: (articlePropName === "공지사항") ? "🔴공지" : articlePropName,
     articleNo,
     userId : (userRole === "admin") ? (userId + ` (${userRole})`) : userId,
     subject,
