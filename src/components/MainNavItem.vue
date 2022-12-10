@@ -15,7 +15,6 @@ export default {
         ...mapState("curr-router", ["path"]),
     },
     created() {
-        console.log(this.path);
         if (this.to === this.path) {
             this.classOnSelect = "item-selected";
         } else {
