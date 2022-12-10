@@ -103,7 +103,7 @@
 
 <script>
 import { auth as api } from "@/api";
-import { mapMutations } from "vuex";
+import { mapMutations, mapActions } from "vuex";
 
 export default {
   created() {
@@ -124,6 +124,7 @@ export default {
   },
   methods: {
     ...mapMutations("auth", ["SET_USER"]),
+    ...mapActions("auth", ["userResign"]),
     onSubmit(event) {
       event.preventDefault();
 
@@ -151,15 +152,9 @@ export default {
       event.preventDefault();
       api.checkPassword({password: this.passwordCheck})
         .then(res => {
-          api
-            .resignUser(this.$store.state.auth.user.userId)
-            .then((res) => {
-              alert("회원탈퇴 완료");
-              this.SET_USER({});
+          this.userResign(this.$store.state.auth.user.userId)
+            .then(res => {
               this.$router.push("/");
-            })
-            .catch((reason) => {
-              alert("회원탈퇴 중 오류가 발생했습니다.");
             });
         }).catch(err => {
           alert("비밀번호가 다릅니다");

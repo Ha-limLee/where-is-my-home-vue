@@ -47,8 +47,6 @@ export default {
       event.preventDefault();
       this.$store.dispatch("auth/userLogout")
         .then(res => {
-          sessionStorage.removeItem("access-token");
-          sessionStorage.removeItem("refresh-token");
           if (this.$route.path != "/") {
             this.$router.push("/");
           }
