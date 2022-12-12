@@ -51,12 +51,12 @@
 
                 <b-button
                     v-if="form.userId === $store.state.auth.user.userId"
-                    type="submit" variant="primary" class="mr-2">
+                    type="submit" variant="outline-primary" class="mr-2">
                     수정
                 </b-button>
                 <b-button
                     v-if="form.userId === $store.state.auth.user.userId"
-                    variant="danger" class="mr-2"
+                    variant="outline-danger" class="mr-2"
                     @click="onDelete">
                     삭제
                 </b-button>
