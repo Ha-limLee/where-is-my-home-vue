@@ -1,6 +1,8 @@
 // src/mocks/handlers.js
 import { rest } from 'msw'
 
+const url = process.env.VUE_APP_API_URL;
+
 export const handlers = [
   rest.post('/login', (req, res, ctx) => {
     // Persist user's authentication in the session

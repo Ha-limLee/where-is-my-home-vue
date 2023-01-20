@@ -60,6 +60,12 @@ export default {
     };
   },
   created() {
+    fetch('/login', {method: 'post'})
+    .then(val => {
+      console.log("여기 로그인");
+      console.log(val);
+    });
+
     const keyword = this.subjects[this.currentTab];
     newsApi.getNews(keyword).then(({ data }) => {
       this.newses = data;
