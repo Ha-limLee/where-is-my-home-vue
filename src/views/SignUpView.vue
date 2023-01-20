@@ -1,6 +1,4 @@
 <template>
-  <div>
-    <MainHeaderVue />
     <b-container class="mt-4">
       <b-row align-h="center">
         <h3>회원가입</h3>
@@ -61,23 +59,16 @@
           ></b-form-input>
         </b-form-group>
 
-        <b-button type="submit" class="mr-2" variant="primary">회원가입</b-button>
-        <b-button type="reset" variant="secondary">초기화</b-button>
+        <b-button type="submit" class="mr-2" variant="outline-primary">회원가입</b-button>
+        <b-button type="reset" variant="outline-secondary">초기화</b-button>
       </b-form>
-      <b-card class="mt-3" header="Form Data Result">
-        <pre class="m-0">{{ form }}</pre>
-      </b-card>
     </b-container>
-  </div>
 </template>
 
 <script>
-import MainHeaderVue from "@/components/MainHeader.vue";
+import { auth as api } from "@/api";
 
 export default {
-  components: {
-    MainHeaderVue,
-  },
   data() {
     return {
       form: {
@@ -93,22 +84,14 @@ export default {
   methods: {
     onSubmit(event) {
       event.preventDefault();
-      const option = {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(this.form),
-      };
 
-      fetch(`${process.env.VUE_APP_SERVER_URL}/users/join`, option).then((res) => {
-        if (res.ok) {
+      api.joinUser(this.form)
+        .then(res => {
+          alert("회원가입 완료");
           this.$router.push("/login");
-        } else {
-          alert("중복된 아이디 입니다");
-        }
-      });
+        }).catch(reason => {
+          alert("중복된 아이디입니다.");
+        });
     },
     onReset(event) {
       event.preventDefault();
