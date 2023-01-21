@@ -27,4 +27,17 @@
  * @property {string} tableName
  */
 
+/**
+ * @typedef {Object} News
+ * @property {string} title
+ * @property {string} description
+ * @property {string} pubDate
+ * @property {string} link
+ * @property {string} originallink
+ */
+
+/**
+ * @typedef {'부동산' | '금리' | '경제' | '주식' | '아파트'} NewsSubject
+ */
+
 export const Types = {};
