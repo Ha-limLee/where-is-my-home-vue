@@ -1,7 +1,6 @@
 // src/mocks/handlers.js
 import { rest } from 'msw'
-
-const url = process.env.VUE_APP_API_URL;
+import newsHandler from './handle-api/news';
 
 export const handlers = [
   rest.post('/login', (req, res, ctx) => {
@@ -13,6 +12,15 @@ export const handlers = [
       ctx.status(200),
     )
   }),
+
+  rest.get('/board/article/type', (req, res, ctx) => {
+    return res(
+      ctx.status(200),
+      ctx.json(['안녕']),
+    );
+  }),
+
+  ...newsHandler,
 
   rest.get('/user', (req, res, ctx) => {
     // Check if the user is authenticated in this session
