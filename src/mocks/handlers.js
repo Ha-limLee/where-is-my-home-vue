@@ -1,18 +1,9 @@
 // src/mocks/handlers.js
 import { rest } from 'msw'
 import newsHandler from './handle-api/news';
+import authHandler from './handle-api/auth';
 
 export const handlers = [
-  rest.post('/login', (req, res, ctx) => {
-    // Persist user's authentication in the session
-    sessionStorage.setItem('is-authenticated', 'true')
-
-    return res(
-      // Respond with a 200 status code
-      ctx.status(200),
-    )
-  }),
-
   rest.get('/board/article/type', (req, res, ctx) => {
     return res(
       ctx.status(200),
@@ -21,6 +12,7 @@ export const handlers = [
   }),
 
   ...newsHandler,
+  ...authHandler,
 
   rest.get('/user', (req, res, ctx) => {
     // Check if the user is authenticated in this session
