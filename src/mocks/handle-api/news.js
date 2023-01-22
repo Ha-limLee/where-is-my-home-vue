@@ -104,7 +104,9 @@ const data = {
 
 export default [
   rest.get('/naver/news/:subject', (req, res, ctx) => {
+    /** @type {{subject: Types.NewsSubject}} */
     const { subject } = req.params;
+
     return res(
       ctx.status(200),
       ctx.json(data[subject]),
