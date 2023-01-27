@@ -30,18 +30,30 @@ const userTable = {
 const secretKey = new TextEncoder().encode(')!+q90ije;;3vaeb1nu0e!5#z41');
 const alg = 'HS256';
 
+/**
+ * @type { <T>({onExist, onNotExist}: {onExist: (user: User) => T, onNotExist: (user: User) => T}) => (user: User) => T }
+ */
+const checkUserInTable = ({ onExist, onNotExist }) => (user) => {
+  if (user.userId in userTable) return onExist(user);
+  return onNotExist(user);
+}
+
 export default [
   rest.post('users/join', async (req, res, ctx) => {
     /** @type {User} */
-    const body = await req.json();
+    const user = await req.json();
 
-    if (body.userId in userTable) return res( ctx.status(409) );
+    const result = checkUserInTable({
+      onExist: () => {
+        return res(ctx.status(409));
+      },
+      onNotExist: (user) => {
+        userTable[user.userId] = { ...user, role: 'member' };
+        return res(ctx.status(200));
+      }
+    })(user);
 
-    userTable[body.userId] = { ...body, role: 'member' };
-
-    return res(
-      ctx.status(200),
-    );
+    return result;
   }),
   rest.post('/users/login', async (req, res, ctx) => {
     /** @type {User} */
