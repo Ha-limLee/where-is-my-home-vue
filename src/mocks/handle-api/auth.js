@@ -1,3 +1,4 @@
+// @ts-check
 import { rest } from "msw";
 import * as jose from 'jose';
 
@@ -30,67 +31,73 @@ const userTable = {
 const secretKey = new TextEncoder().encode(')!+q90ije;;3vaeb1nu0e!5#z41');
 const alg = 'HS256';
 
-/**
- * @type { <T>({onExist, onNotExist}: {onExist: (user: User) => T, onNotExist: (user: User) => T}) => (user: User) => T }
- */
+/** @type { <T> ({onExist, onNotExist}: {onExist: () => T, onNotExist: (user: User) => T}) => (user: User) => T } */
 const checkUserInTable = ({ onExist, onNotExist }) => (user) => {
-  if (user.userId in userTable) return onExist(user);
+  if (user.userId in userTable) return onExist();
   return onNotExist(user);
-}
+};
+
+/** @type { <T> ({onValid, onInvalid}: {onValid: (user: User) => Promise<T> | T, onInvalid: () => Promise<T> | T}) => ({userId, userPassword}: {userId: string, userPassword: string}) => Promise<T> } */
+const verifyUser = ({ onValid, onInvalid }) => async ({ userId, userPassword }) => {
+  if (userId in userTable && userTable[userId].userPassword === userPassword)
+    return await onValid(userTable[userId]);
+  return await onInvalid();
+};
 
 export default [
   rest.post('users/join', async (req, res, ctx) => {
     /** @type {User} */
     const user = await req.json();
 
-    const result = checkUserInTable({
-      onExist: () => {
-        return res(ctx.status(409));
-      },
-      onNotExist: (user) => {
-        userTable[user.userId] = { ...user, role: 'member' };
-        return res(ctx.status(200));
-      }
-    })(user);
+    const onExist = () => res(ctx.status(409));
+
+    const onNotExist = (/** @type {User} */user) => {
+      userTable[user.userId] = { ...user, role: 'member' };
+      return res(ctx.status(200));
+    };
+
+    const result = checkUserInTable({ onExist, onNotExist })(user);
 
     return result;
   }),
   rest.post('/users/login', async (req, res, ctx) => {
     /** @type {User} */
-    const {userId, userPassword} = await req.json();
+    const { userId, userPassword } = await req.json();
+    
+    const onValid = async (/** @type {User} */ user) => {
+      const payload = {
+        exp: Date.now(),
+        id: user.userId,
+        role: user.role,
+        sub: user.userId,
+        username: user.userName ?? '',
+      };
 
-    if (!(userId in userTable) || userTable[userId].userPassword !== userPassword)
-      return res(ctx.status(200));
+      const accessToken = await new jose.SignJWT(payload)
+        .setProtectedHeader({ alg, typ: "JWT" })
+        .setExpirationTime('30m')
+        .sign(secretKey);
 
-    const user = userTable[userId];
+      const refreshToken = await new jose.SignJWT(payload)
+        .setProtectedHeader({ alg, typ: "JWT" })
+        .setExpirationTime('7d')
+        .sign(secretKey);
 
-    const payload = {
-      exp: Date.now(),
-      id: user.userId,
-      role: user.role,
-      sub: user.userId,
-      username: user.userName ?? '',
+      const tokens = {
+        'access-token': accessToken,
+        'refresh-token': refreshToken,
+      };
+
+      return res(
+        ctx.status(200),
+        ctx.set(tokens),
+      );
     };
 
-    const accessToken = await new jose.SignJWT(payload)
-      .setProtectedHeader({ alg, typ: "JWT" })
-      .setExpirationTime('30m')
-      .sign(secretKey);
+    const onInvalid = () => res(ctx.status(200));
 
-    const refreshToken = await new jose.SignJWT(payload)
-      .setProtectedHeader({ alg, typ: "JWT" })
-      .setExpirationTime('7d')
-      .sign(secretKey);
+    const result = await verifyUser({ onValid, onInvalid })({ userId, userPassword });
 
-    const tokens = {
-      'access-token': accessToken,
-      'refresh-token': refreshToken,
-    };
-
-    return res(
-      ctx.status(200),
-      ctx.set(tokens),
-      ctx.json(),
-    );
+    return result;
   }),
 ];
