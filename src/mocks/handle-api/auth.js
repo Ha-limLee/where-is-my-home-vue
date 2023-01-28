@@ -1,6 +1,7 @@
 // @ts-check
 import { rest } from "msw";
 import * as jose from 'jose';
+import jwtDecode from "jwt-decode";
 
 /**
  * @typedef {Object} User
@@ -14,6 +15,15 @@ import * as jose from 'jose';
 
 /**
  * @typedef {Object<string, User>} UserTable
+ */
+
+/**
+ * @typedef {Object} UserToken
+ * @property {number} exp
+ * @property {string} id
+ * @property {'admin' | 'member'} role
+ * @property {string} sub
+ * @property {string} username
  */
 
 /** @type {UserTable} */
@@ -99,5 +109,14 @@ export default [
     const result = await verifyUser({ onValid, onInvalid })({ userId, userPassword });
 
     return result;
+  }),
+  rest.put('/users/logout', async (req, res, ctx) => {
+    const accessToken = req.headers.get('access-token');
+    /** @type {UserToken} */
+    const user = jwtDecode(accessToken);
+    return res(
+      ctx.status(200),
+      ctx.json({ message: 'success' })
+    );
   }),
 ];
