@@ -54,7 +54,57 @@ const verifyUser = ({ onValid, onInvalid }) => async ({ userId, userPassword }) 
   return await onInvalid();
 };
 
+/**
+ * @typedef {Parameters<import("msw").ResponseResolver>} ResolverParams
+ */
+
+/** @type { (...params: ResolverParams) => (user: User) => Promise<ReturnType<res>> } */
+const handleValid = (req, res, ctx) => async (/** @type {User} */ user) => {
+  const payload = {
+    exp: Date.now(),
+    id: user.userId,
+    role: user.role,
+    sub: user.userId,
+    username: user.userName ?? '',
+  };
+
+  const accessToken = await new jose.SignJWT(payload)
+    .setProtectedHeader({ alg, typ: "JWT" })
+    .setExpirationTime('10s')
+    .sign(secretKey);
+
+  const refreshToken = await new jose.SignJWT(payload)
+    .setProtectedHeader({ alg, typ: "JWT" })
+    .setExpirationTime('7d')
+    .sign(secretKey);
+
+  const tokens = {
+    'access-token': accessToken,
+    'refresh-token': refreshToken,
+  };
+
+  return res(
+    ctx.status(200),
+    ctx.set(tokens),
+  );
+};
+
+/** @type {(...params: ResolverParams) => () => ReturnType<res>} */
+const handleInvalid = (req, res, ctx) => () => res(ctx.status(200));
+
 export default [
+  rest.all('/*', async (req, res, ctx) => {
+    const accessToken = req.headers.get('access-token');
+    const refreshToken = req.headers.get('refresh-token');
+    if (accessToken) {
+      const ret = await jose.jwtVerify(accessToken, secretKey);
+      console.log(ret);
+      const decoded = jose.decodeJwt(accessToken);
+      const exp = decoded.exp;
+      console.log("여기 인터셉터");
+      console.log(exp);
+    }
+  }),
   rest.post('users/join', async (req, res, ctx) => {
     /** @type {User} */
     const user = await req.json();
@@ -73,40 +123,11 @@ export default [
   rest.post('/users/login', async (req, res, ctx) => {
     /** @type {User} */
     const { userId, userPassword } = await req.json();
-    
-    const onValid = async (/** @type {User} */ user) => {
-      const payload = {
-        exp: Date.now(),
-        id: user.userId,
-        role: user.role,
-        sub: user.userId,
-        username: user.userName ?? '',
-      };
 
-      const accessToken = await new jose.SignJWT(payload)
-        .setProtectedHeader({ alg, typ: "JWT" })
-        .setExpirationTime('30m')
-        .sign(secretKey);
-
-      const refreshToken = await new jose.SignJWT(payload)
-        .setProtectedHeader({ alg, typ: "JWT" })
-        .setExpirationTime('7d')
-        .sign(secretKey);
-
-      const tokens = {
-        'access-token': accessToken,
-        'refresh-token': refreshToken,
-      };
-
-      return res(
-        ctx.status(200),
-        ctx.set(tokens),
-      );
-    };
-
-    const onInvalid = () => res(ctx.status(200));
-
-    const result = await verifyUser({ onValid, onInvalid })({ userId, userPassword });
+    const result = await verifyUser({
+      onValid: handleValid(req, res, ctx),
+      onInvalid: handleInvalid(req, res, ctx)
+    })({ userId, userPassword });
 
     return result;
   }),
