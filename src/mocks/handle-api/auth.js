@@ -54,6 +54,8 @@ const verifyUser = ({ onValid, onInvalid }) => async ({ userId, userPassword }) 
   return await onInvalid();
 };
 
+const nowSecond = () => Math.floor(Date.now() / 1000);
+
 /**
  * @typedef {Parameters<import("msw").ResponseResolver>} ResolverParams
  */
@@ -61,7 +63,7 @@ const verifyUser = ({ onValid, onInvalid }) => async ({ userId, userPassword }) 
 /** @type { (...params: ResolverParams) => (user: User) => Promise<ReturnType<res>> } */
 const handleValid = (req, res, ctx) => async (/** @type {User} */ user) => {
   const payload = {
-    exp: Date.now(),
+    exp: nowSecond(),
     id: user.userId,
     role: user.role,
     sub: user.userId,
