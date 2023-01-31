@@ -18,7 +18,7 @@ import jwtDecode from "jwt-decode";
  */
 
 /**
- * @typedef {Object} UserToken
+ * @typedef {Object} UserPayload
  * @property {number} exp
  * @property {string} id
  * @property {'admin' | 'member'} role
@@ -94,18 +94,40 @@ const handleValid = (req, res, ctx) => async (/** @type {User} */ user) => {
 /** @type {(...params: ResolverParams) => () => ReturnType<res>} */
 const handleInvalid = (req, res, ctx) => () => res(ctx.status(200));
 
+/**
+ * 
+ * @param {UserPayload} token 
+ */
+const isTokenExpired = ({exp}) => (exp < nowSecond());
+
+/** @type {(...params: ResolverParams) => ReturnType<res>} */
+const onTokenExpired = (req, res, ctx) => res(ctx.status(409));
+
+/** @type {typeof onTokenExpired} */
+const onTokenNotExpired = (req, res, ctx) => res(ctx.status(200));
+
+/**
+ * @param {UserPayload} token 
+ */
+const checkTokenExpired = (token) => {
+  if (isTokenExpired(token)) return onTokenExpired;
+  return onTokenNotExpired;
+};
+
+const whitelist = ['/users/logout'];
+
 export default [
   rest.all('/*', async (req, res, ctx) => {
     const accessToken = req.headers.get('access-token');
     const refreshToken = req.headers.get('refresh-token');
-    if (accessToken) {
-      const ret = await jose.jwtVerify(accessToken, secretKey);
-      console.log(ret);
-      const decoded = jose.decodeJwt(accessToken);
-      const exp = decoded.exp;
-      console.log("여기 인터셉터");
-      console.log(exp);
-    }
+    const { pathname } = req.url;
+
+    if (!accessToken || whitelist.find(x => x === pathname)) return;
+
+    const verifyResult = await jose.jwtVerify(accessToken, secretKey);
+    const payload = /** @type {UserPayload} */ (verifyResult.payload);
+
+    const result = checkTokenExpired(payload)(req, res, ctx);
   }),
   rest.post('users/join', async (req, res, ctx) => {
     /** @type {User} */
@@ -135,7 +157,7 @@ export default [
   }),
   rest.put('/users/logout', async (req, res, ctx) => {
     const accessToken = req.headers.get('access-token');
-    /** @type {UserToken} */
+    /** @type {UserPayload} */
     const user = jwtDecode(accessToken);
     return res(
       ctx.status(200),
