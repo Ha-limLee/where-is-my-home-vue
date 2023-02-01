@@ -4,6 +4,11 @@ import * as jose from 'jose';
 import jwtDecode from "jwt-decode";
 
 /**
+ * @typedef {Parameters<import("msw").ResponseResolver>} ResolverParams
+ * @typedef {import("msw").ResponseComposition} ResponseComposition
+ */
+
+/**
  * @typedef {Object} User
  * @property {string} userId
  * @property {string} userPassword
@@ -41,27 +46,20 @@ const userTable = {
 const secretKey = new TextEncoder().encode(')!+q90ije;;3vaeb1nu0e!5#z41');
 const alg = 'HS256';
 
-/** @type { <T> ({onExist, onNotExist}: {onExist: () => T, onNotExist: (user: User) => T}) => (user: User) => T } */
-const checkUserInTable = ({ onExist, onNotExist }) => (user) => {
-  if (user.userId in userTable) return onExist();
-  return onNotExist(user);
+/** @type {(user: User) => (...params: ResolverParams) => ReturnType<ResponseComposition>} */
+const onUserExist = (user) => (req, res, ctx) => res(ctx.status(409));
+
+/** @type {typeof onUserExist} */
+const onUserNotExist = (user) => (req, res, ctx) => {
+  userTable[user.userId] = { ...user, role: 'member' };
+  return res(ctx.status(200));
 };
 
-/** @type { <T> ({onValid, onInvalid}: {onValid: (user: User) => Promise<T> | T, onInvalid: () => Promise<T> | T}) => ({userId, userPassword}: {userId: string, userPassword: string}) => Promise<T> } */
-const verifyUser = ({ onValid, onInvalid }) => async ({ userId, userPassword }) => {
-  if (userId in userTable && userTable[userId].userPassword === userPassword)
-    return await onValid(userTable[userId]);
-  return await onInvalid();
-};
+/** @type {typeof onUserExist} */
+const checkUserInTable = (user) => (user.userId in userTable) ? onUserExist(user) : onUserNotExist(user);
 
-const nowSecond = () => Math.floor(Date.now() / 1000);
-
-/**
- * @typedef {Parameters<import("msw").ResponseResolver>} ResolverParams
- */
-
-/** @type { (...params: ResolverParams) => (user: User) => Promise<ReturnType<res>> } */
-const handleValid = (req, res, ctx) => async (/** @type {User} */ user) => {
+/** @type { (user: User) => (...params: ResolverParams) => Promise<ReturnType<ResponseComposition>> } */
+const onUserValid = (user) => async (req, res, ctx) => {
   const payload = {
     exp: nowSecond(),
     id: user.userId,
@@ -91,8 +89,18 @@ const handleValid = (req, res, ctx) => async (/** @type {User} */ user) => {
   );
 };
 
-/** @type {(...params: ResolverParams) => () => ReturnType<res>} */
-const handleInvalid = (req, res, ctx) => () => res(ctx.status(200));
+/** @type {typeof onUserValid} */
+const onUserInvalid = (user) => async (req, res, ctx) => res(ctx.status(200));
+
+/** @type { typeof onUserValid } */
+const verifyUser = (user) => {
+  const {userId, userPassword} = user;
+  if (userId in userTable && userTable[userId].userPassword === userPassword)
+    return onUserValid(user);
+  return onUserInvalid(user);
+};
+
+const nowSecond = () => Math.floor(Date.now() / 1000);
 
 /**
  * 
@@ -133,25 +141,15 @@ export default [
     /** @type {User} */
     const user = await req.json();
 
-    const onExist = () => res(ctx.status(409));
-
-    const onNotExist = (/** @type {User} */user) => {
-      userTable[user.userId] = { ...user, role: 'member' };
-      return res(ctx.status(200));
-    };
-
-    const result = checkUserInTable({ onExist, onNotExist })(user);
+    const result = checkUserInTable(user)(req, res, ctx);
 
     return result;
   }),
   rest.post('/users/login', async (req, res, ctx) => {
     /** @type {User} */
-    const { userId, userPassword } = await req.json();
+    const user = await req.json();
 
-    const result = await verifyUser({
-      onValid: handleValid(req, res, ctx),
-      onInvalid: handleInvalid(req, res, ctx)
-    })({ userId, userPassword });
+    const result = await verifyUser(user)(req, res, ctx);
 
     return result;
   }),
