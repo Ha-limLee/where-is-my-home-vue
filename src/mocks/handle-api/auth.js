@@ -4,6 +4,7 @@ import * as jose from 'jose';
 import jwtDecode from "jwt-decode";
 import { worker } from "../browser";
 import { getHandlers } from "../handlers";
+import router from "@/router";
 
 /**
  * @typedef {Parameters<import("msw").ResponseResolver>} ResolverParams
@@ -32,6 +33,9 @@ import { getHandlers } from "../handlers";
  * @property {string} sub
  * @property {string} username
  */
+
+const ACCESS_TOKEN_DURATION = '5s';
+const REFRESH_TOKEN_DURATION = '20s';
 
 const secretKey = new TextEncoder().encode(')!+q90ije;;3vaeb1nu0e!5#z41');
 const alg = 'HS256';
@@ -65,12 +69,12 @@ const onUserValid = (user) => async (req, res, ctx) => {
 
   const accessToken = await new jose.SignJWT(payload)
     .setProtectedHeader({ alg, typ: "JWT" })
-    .setExpirationTime('10s')
+    .setExpirationTime(ACCESS_TOKEN_DURATION)
     .sign(secretKey);
 
   const refreshToken = await new jose.SignJWT(payload)
     .setProtectedHeader({ alg, typ: "JWT" })
-    .setExpirationTime('7d')
+    .setExpirationTime(REFRESH_TOKEN_DURATION)
     .sign(secretKey);
 
   const tokens = {
@@ -98,26 +102,10 @@ const verifyUser = (user) => (userTable) => {
 const nowSecond = () => Math.floor(Date.now() / 1000);
 
 /**
- * 
  * @param {UserPayload} token 
  */
-const isTokenExpired = ({exp}) => (exp < nowSecond());
 
-/** @type {(...params: ResolverParams) => ReturnType<res>} */
-const onTokenExpired = (req, res, ctx) => res(ctx.status(409));
-
-/** @type {typeof onTokenExpired} */
-const onTokenNotExpired = (req, res, ctx) => res(ctx.status(200));
-
-/**
- * @param {UserPayload} token 
- */
-const checkTokenExpired = (token) => {
-  if (isTokenExpired(token)) return onTokenExpired;
-  return onTokenNotExpired;
-};
-
-const whitelist = ['/users/logout'];
+const whitelist = ['/users/logout', '/users/login'];
 
 /** @type {(userTable: UserTable) => import("msw").ResponseResolver} */
 const joinResolver = (userTable) => async (req, res, ctx) => {
@@ -149,10 +137,23 @@ const filterResolver = () => async (req, res, ctx) => {
 
   if (!accessToken || whitelist.find(x => x === pathname)) return;
 
-  const verifyResult = await jose.jwtVerify(accessToken, secretKey);
-  const payload = /** @type {UserPayload} */ (verifyResult.payload);
-
-  const result = checkTokenExpired(payload)(req, res, ctx);
+  try {
+    await jose.jwtVerify(accessToken, secretKey);
+  } catch (accessErr) { // invalid access token
+    try { // re-issue access token
+      await jose.jwtVerify(refreshToken, secretKey);
+      const payload = /** @type {UserPayload} */ jose.decodeJwt(accessToken);
+      const newAccessToken = await new jose.SignJWT(payload)
+        .setProtectedHeader({ alg, typ: "JWT" })
+        .setExpirationTime(ACCESS_TOKEN_DURATION)
+        .sign(secretKey);
+      sessionStorage.setItem("access-token", newAccessToken);
+      console.log('access token 재발급 완료');
+    } catch (refreshErr) { // invalid refresh token
+      alert('다시 로그인 해주세요');
+      router.push('/login');
+    }
+  }
 };
 
 /** @type {() => import("msw").ResponseResolver<RestRequest<never, import("msw").PathParams<string>>, import("msw").RestContext, import("msw").DefaultBodyType>} */
@@ -187,7 +188,7 @@ const bindings = [
     method: 'put',
     path: '/users/logout',
     resolver: logoutResolver,
-  }
+  },
 ];
 
 const getAuthHandlers = (/** @type {UserTable} */ userTable) =>
