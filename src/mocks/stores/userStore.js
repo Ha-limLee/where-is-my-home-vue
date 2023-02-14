@@ -1,3 +1,4 @@
+// @ts-check
 const initialState = {};
 
 /**
@@ -9,13 +10,9 @@ const initialState = {};
  * @typedef {{type: 'SET', payload: User}} UserAction
  */
 
-/**
- * @param {UserTable} state 
- * @param {UserAction} action 
- * @returns {UserTable}
- */
-const userReducer = (state = initialState, action) => {
-    switch (action.type) {
+/** @type {(state: UserTable | {}, action?: UserAction) => UserTable} */
+const userReducer = (state, action) => {
+    switch (action?.type) {
        case 'SET':
         const {payload} = action;
         return {
@@ -32,7 +29,7 @@ const userReducer = (state = initialState, action) => {
  */
 const createStore = (reducer) => {
     let listeners = [];
-    let state = reducer(undefined, {});
+    let state = reducer(initialState);
     return {
         getState: () => state,
         /**
@@ -54,4 +51,4 @@ const createStore = (reducer) => {
     };
 };
 
-export const userStore = createStore(reducer);
+export const userStore = createStore(userReducer);
