@@ -2,9 +2,8 @@
 import { rest, RestRequest } from "msw";
 import * as jose from 'jose';
 import jwtDecode from "jwt-decode";
-import { worker } from "../browser";
-import { getHandlers } from "../handlers";
 import router from "@/router";
+import { userStore } from "../stores/userStore";
 
 /**
  * @typedef {Parameters<import("msw").ResponseResolver>} ResolverParams
@@ -40,22 +39,24 @@ const REFRESH_TOKEN_DURATION = '20s';
 const secretKey = new TextEncoder().encode(')!+q90ije;;3vaeb1nu0e!5#z41');
 const alg = 'HS256';
 
-/** @type {(user: User) => (userTable: UserTable) => (...params: ResolverParams) => [ReturnType<ResponseComposition>, UserTable]} */
-const onUserExist = (user) => (userTable) => (req, res, ctx) => [res(ctx.status(409)), userTable];
+/** @type {(user: User) => (...params: ResolverParams) => ReturnType<ResponseComposition>} */
+const onUserExist = (user) => (req, res, ctx) => res(ctx.status(409));
 
 /** @type {typeof onUserExist} */
-const onUserNotExist = (user) => (userTable) => (req, res, ctx) => {
+const onUserNotExist = (user) => (req, res, ctx) => {
   /** @type {'member'} */
   const defaultRole = 'member';
-  const nextTable = {
-    ...userTable,
-    [user.userId]: {...user, role: defaultRole},
-  };
-  return [res(ctx.status(200)), nextTable];
+  userStore.dispatch({
+    type: "SET",
+    payload: {...user, role: defaultRole},
+  });
+  return res(ctx.status(200));
 };
 
 /** @type {typeof onUserExist} */
-const checkUserInTable = (user) => (userTable) => (user.userId in userTable) ? onUserExist(user)(userTable) : onUserNotExist(user)(userTable);
+const checkUserInTable = (user) => (user.userId in userStore.getState()) ? onUserExist(user) : onUserNotExist(user);
+
+const nowSecond = () => Math.floor(Date.now() / 1000);
 
 /** @type { (user: User) => (...params: ResolverParams) => Promise<ReturnType<ResponseComposition>> } */
 const onUserValid = (user) => async (req, res, ctx) => {
@@ -91,15 +92,14 @@ const onUserValid = (user) => async (req, res, ctx) => {
 /** @type {typeof onUserValid} */
 const onUserInvalid = (user) => async (req, res, ctx) => res(ctx.status(200));
 
-/** @type { (user: User) => (userTable: UserTable) => ReturnType<onUserValid> } */
-const verifyUser = (user) => (userTable) => {
+/** @type { (user: User) => ReturnType<onUserValid> } */
+const verifyUser = (user) => {
   const {userId, userPassword} = user;
+  const userTable = userStore.getState();
   if (userId in userTable && userTable[userId].userPassword === userPassword)
     return onUserValid(userTable[userId]);
   return onUserInvalid(user);
 };
-
-const nowSecond = () => Math.floor(Date.now() / 1000);
 
 /**
  * @param {UserPayload} token 
@@ -107,30 +107,28 @@ const nowSecond = () => Math.floor(Date.now() / 1000);
 
 const whitelist = ['/users/logout', '/users/login'];
 
-/** @type {(userTable: UserTable) => import("msw").ResponseResolver} */
-const joinResolver = (userTable) => async (req, res, ctx) => {
+/** @type {import("msw").ResponseResolver} */
+const joinResolver = async (req, res, ctx) => {
   /** @type {User} */
   const user = await req.json();
 
-  const [result, nextTable] = checkUserInTable(user)(userTable)(req, res, ctx);
-
-  worker.resetHandlers(...getHandlers(nextTable));
+  const result = checkUserInTable(user)(req, res, ctx);
 
   return result;
 };
 
-/** @type {(userTable: UserTable) => import("msw").ResponseResolver} */
-const loginResolver = (userTable) => async (req, res, ctx) => {
+/** @type {import("msw").ResponseResolver} */
+const loginResolver = async (req, res, ctx) => {
   /** @type {User} */
   const user = await req.json();
 
-  const result = await verifyUser(user)(userTable)(req, res, ctx);
+  const result = await verifyUser(user)(req, res, ctx);
 
   return result;
 };
 
-/** @type {() => import("msw").ResponseResolver} */
-const filterResolver = () => async (req, res, ctx) => {
+/** @type {import("msw").ResponseResolver} */
+const filterResolver = async (req, res, ctx) => {
   const accessToken = req.headers.get('access-token');
   const refreshToken = req.headers.get('refresh-token');
   const { pathname } = req.url;
@@ -156,8 +154,8 @@ const filterResolver = () => async (req, res, ctx) => {
   }
 };
 
-/** @type {() => import("msw").ResponseResolver<RestRequest<never, import("msw").PathParams<string>>, import("msw").RestContext, import("msw").DefaultBodyType>} */
-const logoutResolver = () => async (req, res, ctx) => {
+/** @type {import("msw").ResponseResolver<RestRequest<never, import("msw").PathParams<string>>, import("msw").RestContext, import("msw").DefaultBodyType>} */
+const logoutResolver = async (req, res, ctx) => {
   const accessToken = req.headers.get('access-token');
   /** @type {UserPayload} */
   const user = jwtDecode(accessToken);
@@ -167,31 +165,9 @@ const logoutResolver = () => async (req, res, ctx) => {
   );
 };
 
-/** @type {{method: string; path: string; resolver: typeof joinResolver}[]} */
-const bindings = [
-  {
-    method: 'all',
-    path: '/*',
-    resolver: filterResolver,
-  },
-  {
-    method: 'post',
-    path: '/users/join',
-    resolver: joinResolver,
-  },
-  {
-    method: 'post',
-    path: '/users/login',
-    resolver: loginResolver,
-  },
-  {
-    method: 'put',
-    path: '/users/logout',
-    resolver: logoutResolver,
-  },
+export default [
+  rest.all('/*', filterResolver),
+  rest.post('/users/join', joinResolver),
+  rest.post('/users/login', loginResolver),
+  rest.put('/users/logout', logoutResolver),
 ];
-
-const getAuthHandlers = (/** @type {UserTable} */ userTable) =>
-  bindings.map(({ method, path, resolver }) => rest[method](path, resolver(userTable)));
-
-export default getAuthHandlers;

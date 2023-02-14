@@ -1,13 +1,13 @@
-// src/mocks/handlers.js
+// @ts-check
 import { rest } from 'msw'
 import newsHandler from './handle-api/news';
-import getAuthHandler from './handle-api/auth';
+import authHandler from './handle-api/auth';
 
 /**
  * @typedef {import("./handle-api/auth").UserTable} UserTable
  */
 
-export const getHandlers = (/** @type {UserTable} */ userTable) => [
+export default [
   rest.get('/board/article/type', (req, res, ctx) => {
     return res(
       ctx.status(200),
@@ -16,7 +16,7 @@ export const getHandlers = (/** @type {UserTable} */ userTable) => [
   }),
 
   ...newsHandler,
-  ...getAuthHandler(userTable),
+  ...authHandler,
 
   rest.get('/user', (req, res, ctx) => {
     // Check if the user is authenticated in this session
