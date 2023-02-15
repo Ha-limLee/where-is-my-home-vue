@@ -6,7 +6,13 @@ import router from "@/router";
 import { userStore } from "../stores/userStore";
 
 /**
- * @typedef {Parameters<import("msw").ResponseResolver>} ResolverParams
+ * @template T, K
+ * @typedef {import("msw").ResponseResolver<T, K>} ResponseResolver
+ */
+
+/**
+ * @typedef {import("msw").RestContext} RestContext
+ * @typedef {Parameters<ResponseResolver<RestRequest, RestContext>>} ResolverParams
  * @typedef {import("msw").ResponseComposition} ResponseComposition
  */
 
@@ -107,7 +113,7 @@ const verifyUser = (user) => {
 
 const whitelist = ['/users/logout', '/users/login'];
 
-/** @type {import("msw").ResponseResolver} */
+/** @type {ResponseResolver<RestRequest, RestContext>} */
 const joinResolver = async (req, res, ctx) => {
   /** @type {User} */
   const user = await req.json();
@@ -117,7 +123,7 @@ const joinResolver = async (req, res, ctx) => {
   return result;
 };
 
-/** @type {import("msw").ResponseResolver} */
+/** @type {ResponseResolver<RestRequest, RestContext>} */
 const loginResolver = async (req, res, ctx) => {
   /** @type {User} */
   const user = await req.json();
@@ -127,7 +133,7 @@ const loginResolver = async (req, res, ctx) => {
   return result;
 };
 
-/** @type {import("msw").ResponseResolver} */
+/** @type {ResponseResolver<RestRequest, RestContext>} */
 const filterResolver = async (req, res, ctx) => {
   const accessToken = req.headers.get('access-token');
   const refreshToken = req.headers.get('refresh-token');
@@ -154,7 +160,7 @@ const filterResolver = async (req, res, ctx) => {
   }
 };
 
-/** @type {import("msw").ResponseResolver<RestRequest<never, import("msw").PathParams<string>>, import("msw").RestContext, import("msw").DefaultBodyType>} */
+/** @type {ResponseResolver<RestRequest, RestContext>} */
 const logoutResolver = async (req, res, ctx) => {
   const accessToken = req.headers.get('access-token');
   /** @type {UserPayload} */
@@ -165,9 +171,23 @@ const logoutResolver = async (req, res, ctx) => {
   );
 };
 
+/** @type {ResponseResolver<RestRequest, RestContext>} */
+const mypageResolver = async (req, res, ctx) => {
+  const accessToken = req.headers.get('access-token');
+  /** @type {UserPayload} */
+  const user = jwtDecode(accessToken);
+  const userDetail = (userStore.getState())[user.id];
+  console.log('here user detail', userDetail);
+  return res(
+    ctx.status(200),
+    ctx.json(userDetail),
+  );
+};
+
 export default [
   rest.all('/*', filterResolver),
   rest.post('/users/join', joinResolver),
   rest.post('/users/login', loginResolver),
   rest.put('/users/logout', logoutResolver),
+  rest.get('users/user/mypage', mypageResolver),
 ];
