@@ -111,7 +111,7 @@ const verifyUser = (user) => {
  * @param {UserPayload} token 
  */
 
-const whitelist = ['/users/logout', '/users/login'];
+const whitelist = ['/users/logout', '/users/login', '/users/join'];
 
 /** @type {ResponseResolver<RestRequest, RestContext>} */
 const joinResolver = async (req, res, ctx) => {
@@ -177,11 +177,19 @@ const mypageResolver = async (req, res, ctx) => {
   /** @type {UserPayload} */
   const user = jwtDecode(accessToken);
   const userDetail = (userStore.getState())[user.id];
-  console.log('here user detail', userDetail);
   return res(
     ctx.status(200),
     ctx.json(userDetail),
   );
+};
+
+/** @type {typeof mypageResolver} */
+const editUserResolver = async (req, res, ctx) => {
+  /** @type {User} */
+  const editedUser = await req.json();
+  const original = (userStore.getState())[editedUser.userId];
+  userStore.dispatch({type: "SET", payload: {...original, ...editedUser}});
+  return res( ctx.status(200) );
 };
 
 export default [
@@ -189,5 +197,6 @@ export default [
   rest.post('/users/join', joinResolver),
   rest.post('/users/login', loginResolver),
   rest.put('/users/logout', logoutResolver),
+  rest.put('users/join', editUserResolver),
   rest.get('users/user/mypage', mypageResolver),
 ];
