@@ -21,6 +21,8 @@ after
 
 ![after refactor](./docs/img/refactor-after.png)
 
+- [ ] testing
+
 ## Project setup
 ```
 npm install
