@@ -146,7 +146,7 @@ const filterResolver = async (req, res, ctx) => {
   } catch (accessErr) { // invalid access token
     try { // re-issue access token
       await jose.jwtVerify(refreshToken, secretKey);
-      const payload = /** @type {UserPayload} */ jose.decodeJwt(accessToken);
+      const payload = /** @type {UserPayload} */ (jose.decodeJwt(accessToken));
       const newAccessToken = await new jose.SignJWT(payload)
         .setProtectedHeader({ alg, typ: "JWT" })
         .setExpirationTime(ACCESS_TOKEN_DURATION)
@@ -192,11 +192,35 @@ const editUserResolver = async (req, res, ctx) => {
   return res( ctx.status(200) );
 };
 
+/** @type {typeof mypageResolver} */
+const checkPasswordResolver = async (req, res, ctx) => {
+  console.info("her password check");
+  /** @type {{password: string}} */
+  const {password} = await req.json();
+  const accessToken = req.headers.get('access-token');
+  const {id} = /** @type {UserPayload} */ (jose.decodeJwt(accessToken));
+  const user = (userStore.getState())[id];
+  console.log(user);
+  if (user.userPassword === password) return res( ctx.status(200) );
+  return res(
+    ctx.status(400),
+  );
+};
+
+/** @type {typeof mypageResolver} */
+const deleteUserResolver = async (req, res, ctx) => {
+  const {userId} = /** @type {{userId: string}} */ (req.params);
+  userStore.dispatch({type: "REMOVE", payload: userId});
+  return res( ctx.status(200) );
+};
+
 export default [
   rest.all('/*', filterResolver),
   rest.post('/users/join', joinResolver),
   rest.post('/users/login', loginResolver),
+  rest.post('/users/passwordCheck', checkPasswordResolver),
   rest.put('/users/logout', logoutResolver),
-  rest.put('users/join', editUserResolver),
-  rest.get('users/user/mypage', mypageResolver),
+  rest.put('/users/join', editUserResolver),
+  rest.get('/users/user/mypage', mypageResolver),
+  rest.delete('/users/:userId', deleteUserResolver),
 ];
