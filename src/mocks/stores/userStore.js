@@ -1,5 +1,5 @@
 // @ts-check
-const initialState = {};
+const initialState = JSON.parse(sessionStorage.getItem("userTable")) ?? {};
 
 /**
  * @typedef {import("../handle-api/auth").User} User
@@ -7,18 +7,24 @@ const initialState = {};
  */
 
 /**
- * @typedef {{type: 'SET', payload: User}} UserAction
+ * @typedef {{type: 'SET'; payload: User}} SetAction
+ * @typedef {{type: 'REMOVE'; payload: string}} RemoveAction
+ * @typedef {SetAction | RemoveAction} UserAction
  */
 
 /** @type {(state: UserTable | {}, action?: UserAction) => UserTable} */
 const userReducer = (state, action) => {
     switch (action?.type) {
-       case 'SET':
-        const {payload} = action;
-        return {
-            ...state,
-            [payload.userId]: payload,
-        };
+        case 'SET':
+            const user = action.payload;
+            return {
+                ...state,
+                [user.userId]: user,
+            };
+        case 'REMOVE':
+            const userId = action.payload;
+            delete state[userId];
+            return { ...state };
         default:
             return state;
     }
@@ -38,9 +44,10 @@ const createStore = (reducer) => {
         dispatch: (action) => {
             state = reducer(state, action);
             listeners.forEach(listener => {
-                listener();
+                listener(state);
             });
         },
+        /** @type {(newListener: (state: UserTable) => void) => () => void} */
         subscribe: (newListener) => {
             listeners.push(newListener);
             const unsubscribe = () => {
@@ -51,4 +58,9 @@ const createStore = (reducer) => {
     };
 };
 
-export const userStore = createStore(userReducer);
+const userStore = createStore(userReducer);
+userStore.subscribe((state) => {
+    sessionStorage.setItem("userTable", JSON.stringify(state));
+});
+
+export {userStore};
