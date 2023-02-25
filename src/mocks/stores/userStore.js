@@ -1,9 +1,10 @@
 // @ts-check
-const initialState = JSON.parse(sessionStorage.getItem("userTable")) ?? {};
+
+const initialState = (typeof sessionStorage === "undefined") ? {} : sessionStorage.getItem("userTable");
 
 /**
- * @typedef {import("../handle-api/auth").User} User
- * @typedef {import("../handle-api/auth").UserTable} UserTable
+ * @typedef {import("../api/auth").User} User
+ * @typedef {import("../api/auth").UserTable} UserTable
  */
 
 /**
@@ -13,7 +14,7 @@ const initialState = JSON.parse(sessionStorage.getItem("userTable")) ?? {};
  */
 
 /** @type {(state: UserTable | {}, action?: UserAction) => UserTable} */
-const userReducer = (state, action) => {
+export const userReducer = (state, action) => {
     switch (action?.type) {
         case 'SET':
             const user = action.payload;
@@ -32,8 +33,9 @@ const userReducer = (state, action) => {
 
 /**
  * @param {typeof userReducer} reducer 
+ * @param {{}} initialState
  */
-const createStore = (reducer) => {
+export const createStore = (reducer, initialState) => {
     let listeners = [];
     let state = reducer(initialState);
     return {
@@ -58,7 +60,7 @@ const createStore = (reducer) => {
     };
 };
 
-const userStore = createStore(userReducer);
+const userStore = createStore(userReducer, initialState);
 userStore.subscribe((state) => {
     sessionStorage.setItem("userTable", JSON.stringify(state));
 });
