@@ -48,8 +48,12 @@
 <script>
 import { auth as api } from "@/api";
 import jwt_decode from 'jwt-decode';
+import { mapActions, mapMutations } from "vuex";
 
 export default {
+  created() {
+    this.SET_USER({});
+  },
   data() {
     return {
       form: {
@@ -60,6 +64,7 @@ export default {
     };
   },
   methods: {
+    ...mapMutations("auth", ["SET_USER"]),
     onSubmit(event) {
       event.preventDefault();
 

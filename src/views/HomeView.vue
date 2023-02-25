@@ -23,15 +23,7 @@
 // @ is an alias to /src
 import MainHeaderVue from "@/components/MainHeader.vue";
 import { news as newsApi } from "@/api";
-
-/**
- * @typedef News
- * @property {string} title
- * @property {string} description
- * @property {string} pubDate
- * @property {string} link
- * @property {string} originallink
- */
+import * as Types from '@/types';
 
 const duration = 4000;
 
@@ -50,8 +42,9 @@ export default {
   data() {
     return {
       publicPath: process.env.BASE_URL,
+      /** @type {Types.NewsSubject[]} */
       subjects: ["부동산", "금리", "경제", "주식", "아파트"],
-      /** @type {News[]} */
+      /** @type {Types.News[]} */
       newses: [],
       currentIndex: 0,
       currentTab: 0,

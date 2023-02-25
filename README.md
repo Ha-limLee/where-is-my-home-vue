@@ -1,6 +1,28 @@
 # Take Me Home
 ![main-page](./docs/img/main-page.png)
 
+## WIP
+
+- [ ] mock server API
+
+Let the web page works without back-end API.
+
+Use [MSW](https://mswjs.io/) to intercept the API calls.
+
+- [ ] refactoring
+
+Make code declarative.
+
+before
+
+![before refactor](./docs/img/refactor-before.png)
+
+after
+
+![after refactor](./docs/img/refactor-after.png)
+
+- [ ] testing
+
 ## Project setup
 ```
 npm install
