@@ -59,7 +59,7 @@ When the function receives `{userId: 'james'}` as an argument and is executed,
 
 `userTable` can be `{'james': {userId: 'james'}}`, `{'amy': {userId: 'amy'}, 'james': {userId: 'james'}}` and so on.
 
-On top of that, It's **hard to testable**.
+On top of that, It's **hard to test**.
 
 To test the function, we have to export `userTable`.
 
