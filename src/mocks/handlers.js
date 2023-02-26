@@ -1,10 +1,10 @@
 // @ts-check
 import { rest } from 'msw'
-import newsHandler from './handle-api/news';
-import authHandler from './handle-api/auth';
+import newsHandler from './api/news';
+import authHandler from './api/auth';
 
 /**
- * @typedef {import("./handle-api/auth").UserTable} UserTable
+ * @typedef {import("./api/auth").UserTable} UserTable
  */
 
 export default [
