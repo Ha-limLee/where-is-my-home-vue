@@ -1,6 +1,10 @@
 // @ts-check
 
-const initialState = (typeof sessionStorage === "undefined") ? {} : sessionStorage.getItem("userTable");
+const initialState = (() => {
+    if (typeof sessionStorage === "undefined") return {};
+    const table = JSON.parse(sessionStorage.getItem("userTable"));
+    return table ?? {};
+})();
 
 /**
  * @typedef {import("../api/auth").User} User
