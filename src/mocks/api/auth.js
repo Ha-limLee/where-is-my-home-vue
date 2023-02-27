@@ -40,7 +40,7 @@ import { userStore } from "../stores/userStore";
  */
 
 const ACCESS_TOKEN_DURATION = '5s';
-const REFRESH_TOKEN_DURATION = '20s';
+const REFRESH_TOKEN_DURATION = '7d';
 
 const secretKey = new TextEncoder().encode(')!+q90ije;;3vaeb1nu0e!5#z41');
 const alg = 'HS256';
